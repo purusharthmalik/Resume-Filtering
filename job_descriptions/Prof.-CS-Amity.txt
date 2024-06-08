@@ -1,0 +1,35 @@
+Amity University, Patna campus invites applications for a tenure-track Assistant Professor position in the Department of Computer Science. The successful candidate will demonstrate a strong commitment to teaching, research, and service in the field of computer science.
+
+Responsibilities
+
+    Teach undergraduate and graduate courses in computer science, with a focus on [insert areas of specialization or interest, e.g., artificial intelligence, machine learning, software engineering, etc.].
+    Develop and deliver innovative curriculum that incorporates industry best practices and emerging technologies.
+    Advise and mentor undergraduate and graduate students in academic and career development.
+    Conduct high-quality research leading to publications in peer-reviewed journals and presentations at conferences.
+    Seek external funding to support research activities and contribute to the growth of the department.
+    Participate in departmental and institutional service activities, including committee work, academic advising, and community outreach.
+    Contribute to the collegial and collaborative atmosphere of the department through active engagement with colleagues and participation in departmental events and initiatives.
+
+Qualifications
+
+    A Ph.D. in Computer Science or atleast Thesis submitted
+    Evidence of excellence in teaching at the undergraduate and/or graduate level.
+    A strong record of research productivity, including publications in reputable journals and conferences.
+    Demonstrated expertise in [insert areas of specialization].
+    Ability to effectively communicate complex concepts to diverse audiences.
+    Commitment to fostering an inclusive and equitable learning environment.
+    Strong interpersonal skills and the ability to work collaboratively with students, faculty, and staff.
+    Potential for leadership and contribution to the academic community.
+
+Preferred Qualifications
+
+    Experience securing external research funding.
+    Experience supervising undergraduate or graduate research projects.
+    Experience with curriculum development and assessment.
+    Experience with industry collaboration or technology transfer initiatives.
+
+Application Process
+
+Interested candidates should submit a cover letter, curriculum vitae, statement of teaching philosophy, statement of research interests, evidence of teaching effectiveness (e.g., teaching evaluations), and contact information for three professional references. Review of applications will begin immediately and continue until the position is filled.
+
+Skills:- Phd, Machine Learning (ML), Algorithms, Network Security, Python and Data mining

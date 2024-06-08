@@ -1,0 +1,8 @@
+flask
+python-docx
+pymupdf
+transformers
+accelerate
+torch
+huggingface-hub
+google-generativeai

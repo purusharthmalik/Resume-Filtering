@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Loading</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script>
+        setTimeout(function() {
+            window.location.href = "{{ url_for('resume_form') }}";
+        }, 30000); // Redirect to the form after 30 seconds
+    </script>
+</head>
+<body>
+    <h2>Processing your resume...</h2>
+    <p>It usually takes us 30 seconds to process your resume. Please wait...</p>
+</body>
+</html>

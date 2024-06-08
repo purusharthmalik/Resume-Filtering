@@ -1,0 +1,96 @@
+{
+    "Personal_Information": {
+        "Name": "Vigesh D",
+        "Email": "dhananjeyanvigesh@gmail.com",
+        "Phone_Number": "8778403686",
+        "Address": "Marathalli, Kundalahalli Gate, Bengalore, India",
+        "LinkedIn_URL": "linkedin.com/in/vigesh-d-329715272"
+    },
+    "Summary": "Dedicated and enthusiastic Frontend Developer with a strong\nfoundation in web development and a passion for creating visually\nappealing and user-friendly interfaces. Pro\ufb01cient in HTML, CSS, and\nJavaScript, with a solid understanding of frontend frameworks and\nlibraries like Reactjs. A quick learner with excellent problem-solving\nskills and a collaborative mindset. Seeking an opportunity to\ncontribute to a dynamic team and gain practical experience in the\n\ufb01eld",
+    "Work_Experience": [],
+    "Projects": [
+        {
+            "Name_of_Project": "Static WebPage",
+            "Description": "Created an static webpage using HTML and CSS. I have successfully built\nresponsive and visually appealing webpages. With a focus on clean code\nand attention to detail, I strive to deliver user-friendly experiences.",
+            "Start_Date": null,
+            "End_Date": null
+        },
+        {
+            "Name_of_Project": "Animated WebPage",
+            "Description": "Created a user-friendly animated webpage using HTML and CSS. With a\nsolid understanding of front-end development principles, I am\ndedicated to creating visually stunning and seamless animations that\nbing websites to life.",
+            "Start_Date": null,
+            "End_Date": null
+        },
+        {
+            "Name_of_Project": "Landing and Animated Web Page",
+            "Description": "Created a user-friendly animated landing webpage using HTML5 and\nCSS,for learning purposes. I specialize in crafting captivating and\ndynamic landing animated webpages.\n\nBy utilizing animations, transitions, and modern design techniques, I aim\nto deliver impactful user experiences that leave a lasting impression.",
+            "Start_Date": null,
+            "End_Date": null
+        }
+    ],
+    "Achievements": [],
+    "Education": [
+        {
+            "Degree/Course": "BCA - Bachelor's in Computer Application",
+            "Field_of_Study": null,
+            "Institute": "Islamiah College (Autonomous) - Thiruvalluvar\nUniversity",
+            "Marks/Percentage/GPA": "7.5 CGPA",
+            "Start_Date": "2019",
+            "End_Date": "2022"
+        },
+        {
+            "Degree/Course": "HIGHER SECONDARY",
+            "Field_of_Study": null,
+            "Institute": "Bethel Matric Hr Sec School",
+            "Marks/Percentage/GPA": "50%",
+            "Start_Date": "2017",
+            "End_Date": "2019"
+        },
+        {
+            "Degree/Course": "SSLC",
+            "Field_of_Study": null,
+            "Institute": "Bethel Matric Hr Sec School",
+            "Marks/Percentage/GPA": "76.5%",
+            "Start_Date": "2016",
+            "End_Date": "2017"
+        }
+    ],
+    "Certifications": [
+        {
+            "Certification_Title": "HTML5 and CSS3 basic to advance course",
+            "Issuing_Organization": "Udemy's HTML and CSS Course",
+            "Date_Of_Issue": null
+        }
+    ],
+    "Skills": [
+        "HTML5",
+        "CSS3",
+        "JavaScript",
+        "BootStrap",
+        "ReactJS",
+        "Redux",
+        "Context API",
+        "GIT",
+        "GITHUB",
+        "VS Code",
+        "StackBlitz",
+        "Netlify",
+        "Animation Librarys"
+    ],
+    "Extracurricular_Activities": [
+        "Swimming",
+        "Watching Anime",
+        "Badminton",
+        "Hearing Music"
+    ],
+    "Language_Competencies": [
+        {
+            "Language": "English",
+            "Proficiency": "Professional Working Pro\ufb01ciency"
+        },
+        {
+            "Language": "Tamil",
+            "Proficiency": "Native or Bilingual Pro\ufb01ciency"
+        }
+    ]
+}

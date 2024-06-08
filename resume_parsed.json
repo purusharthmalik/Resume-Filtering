@@ -1,0 +1,98 @@
+{
+    "Personal Information": {
+        "name": "Vigesh D",
+        "email": "dhananjeyanvigesh@gmail.com",
+        "phone number": "8778403686",
+        "address": "Marathalli, Kundalahalli Gate, Bengalore, India",
+        "linkedin url": "linkedin.com/in/vigesh-d-329715272"
+    },
+    "Summary": "Dedicated and enthusiastic Frontend Developer with a strong foundation in web development and a passion for creating visually appealing and user-friendly interfaces. Proficient in HTML, CSS, and JavaScript, with a solid understanding of frontend frameworks and libraries like Reactjs. A quick learner with excellent problem-solving skills and a collaborative mindset. Seeking an opportunity to contribute to a dynamic team and gain practical experience in the field",
+    "Work Experience": [],
+    "Project Details": [
+        {
+            "Name of Project with short introduction of it, if mentioned": "Static WebPage",
+            "Description of project": "Created an static webpage using HTML and CSS. I have successfully built responsive and visually appealing webpages. With a focus on clean code and attention to detail, I strive to deliver user-friendly experiences.",
+            "Start Date if any": null,
+            "End Date if any": null
+        },
+        {
+            "Name of Project with short introduction of it, if mentioned": "Animated WebPage",
+            "Description of project": "Created a user-friendly animated webpage using HTML and CSS. With a solid understanding of front-end development principles, I am dedicated to creating visually stunning and seamless animations that bring websites to life.",
+            "Start Date if any": null,
+            "End Date if any": null
+        },
+        {
+            "Name of Project with short introduction of it, if mentioned": "Landing and Animated Web Page",
+            "Description of project": "Created a user-friendly animated landing webpage using HTML5 and CSS,for learning purposes. I specialize in crafting captivating and dynamic landing animated webpages.",
+            "Start Date if any": null,
+            "End Date if any": null
+        }
+    ],
+    "Achievement Details": [],
+    "Education Details": [
+        {
+            "Degree/Course": "BCA - Bachelor's in Computer Application",
+            "Field of Study": null,
+            "Institute": "Islamiah College (Autonomous) - Thiruvalluvar University",
+            "Marks/Percentage/GPA": "7.5 CGPA",
+            "Start Date if any": "2019",
+            "End Date/ Passing Year": "2022"
+        },
+        {
+            "Degree/Course": "HIGHER SECONDARY",
+            "Field of Study": null,
+            "Institute": "Bethel Matric Hr Sec School",
+            "Marks/Percentage/GPA": "50%",
+            "Start Date if any": "2017",
+            "End Date/ Passing Year": "2019"
+        },
+        {
+            "Degree/Course": "SSLC",
+            "Field of Study": null,
+            "Institute": "Bethel Matric Hr Sec School",
+            "Marks/Percentage/GPA": "76.5%",
+            "Start Date if any": "2016",
+            "End Date/ Passing Year": "2017"
+        }
+    ],
+    "Certification Details": [
+        {
+            "Certification Title": "HTML5 and CSS3 basic to advance course",
+            "Date Of Issue": null,
+            "Issuing Organization": "Udemy"
+        }
+    ],
+    "Skills": [
+        "HTML5",
+        "CSS3",
+        "JavaScript",
+        "BootStrap",
+        "ReactJS",
+        "Redux",
+        "Context API",
+        "GIT",
+        "GITHUB",
+        "VS Code",
+        "StackBlitz",
+        "Netlify",
+        "Animation Librarys"
+    ],
+    "Extracurricular Activities/Hobbies": [
+        "Web Designing",
+        "Web Development",
+        "Swimming",
+        "Watching Anime",
+        "Badminton",
+        "Hearing Music"
+    ],
+    "Language Competencies": [
+        {
+            "Language": "English",
+            "Proficiency Level": "Professional Working Proficient"
+        },
+        {
+            "Language": "Tamil",
+            "Proficiency Level": "Native or Bilingual Proficient"
+        }
+    ]
+}
