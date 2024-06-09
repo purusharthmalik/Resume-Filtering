@@ -1,20 +1,3 @@
-# from flask import Flask, render_template, request, jsonify
-# import json
-
-# app = Flask(__name__)
-# with open('resume.json') as f:
-#     resume_data = json.load(f)
-# @app.route('/')
-# def resume_form():
-#     return render_template('resume_form.html', data=resume_data)
-# @app.route('/submit', methods=['POST'])
-# def submit_form():
-#     submitted_data = request.form.to_dict()
-#     print(submitted_data)
-#     return jsonify({"message": "Form submitted successfully!"})
-# if __name__ == '__main__':
-#     app.run(debug=True)
-
 import os
 from flask import Flask, render_template, request, jsonify, redirect, url_for
 import fitz
@@ -77,7 +60,7 @@ def upload_file():
         b. Extract email of the applicant.
         c. Extract phone number of the applicant.
         d. Exract address of the applicant.
-        e. Extract linkedin url of the applicant.
+        e. Extract linkedin url of the applicant (Add <https://> in front of the link if it is not already present).
         2. Extract me the Summary of the applicant if mentioned.
         3. Extract me Work Experience details with keys being:
         a. Company name
@@ -179,14 +162,9 @@ def upload_file():
         truncated_text = '\n'.join(truncated_lines)
         response_json = json.loads(truncated_text)
         output_filename = app.config['GENERATED_JSON']
-        print(response_json)
         with open(output_filename, 'w') as json_file:
             json.dump(response_json, json_file, indent=4)
-        return redirect(url_for('loading_page'))
-    
-@app.route('/loading')
-def loading_page():
-    return render_template('loading.html')
+        return redirect(url_for('resume_form'))
 
 @app.route('/resume_form')
 def resume_form():

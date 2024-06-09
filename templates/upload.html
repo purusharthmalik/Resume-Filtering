@@ -16,13 +16,17 @@
                     <img src="{{ url_for('static', filename='images/doc.png') }}" alt="DOC">
                     <img src="{{ url_for('static', filename='images/pdf.png') }}" alt="PDF">
                 </div>
-                <input type="file" name="file" accept=".jpg,.jpeg,.png,.pdf" id="file-input" multiple>
+                <input type="file" name="file" accept=".doc,.pdf" id="file-input" multiple>
                 <label for="file-input" class="choose-files-btn">Choose Files</label>
             </div>
-            <div id="file-name-display"></div>
-            <button type="submit" class="upload-btn">Upload</button>
+            <div id="file-name-display" style="font-family: Arial, sans-serif; text-decoration: none;"></div>
+            <button id="uploadBtn" type="submit" class="upload-btn">
+                <img id="processingGif" src="{{ url_for('static', filename='images/processing.gif') }}" alt="Processing" style="display: none; width: 20px; height: 20px; vertical-align: middle;">
+                <span>Upload</span>
+            </button>
+            
         </form>
     </div>
-    <script src="{{ url_for('static', filename='js/upload_script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>

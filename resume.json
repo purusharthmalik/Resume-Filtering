@@ -4,9 +4,9 @@
         "Email": "dhananjeyanvigesh@gmail.com",
         "Phone_Number": "8778403686",
         "Address": "Marathalli, Kundalahalli Gate, Bengalore, India",
-        "LinkedIn_URL": "linkedin.com/in/vigesh-d-329715272"
+        "LinkedIn_URL": "https://linkedin.com/in/vigesh-d-329715272"
     },
-    "Summary": "Dedicated and enthusiastic Frontend Developer with a strong\nfoundation in web development and a passion for creating visually\nappealing and user-friendly interfaces. Pro\ufb01cient in HTML, CSS, and\nJavaScript, with a solid understanding of frontend frameworks and\nlibraries like Reactjs. A quick learner with excellent problem-solving\nskills and a collaborative mindset. Seeking an opportunity to\ncontribute to a dynamic team and gain practical experience in the\n\ufb01eld",
+    "Summary": "Dedicated and enthusiastic Frontend Developer with a strong\nfoundation in web development and a passion for creating visually\nappealing and user-friendly interfaces. Proficient in HTML, CSS, and\nJavaScript, with a solid understanding of frontend frameworks and\nlibraries like Reactjs. A quick learner with excellent problem-solving\nskills and a collaborative mindset. Seeking an opportunity to\ncontribute to a dynamic team and gain practical experience in the\nfield",
     "Work_Experience": [],
     "Projects": [
         {
@@ -17,13 +17,13 @@
         },
         {
             "Name_of_Project": "Animated WebPage",
-            "Description": "Created a user-friendly animated webpage using HTML and CSS. With a\nsolid understanding of front-end development principles, I am\ndedicated to creating visually stunning and seamless animations that\nbing websites to life.",
+            "Description": "Created a user-friendly animated webpage using HTML and CSS. With a\nsolid understanding of front-end development principles, I am\ndedicated to creating visually stunning and seamless animations that\nbring websites to life.",
             "Start_Date": null,
             "End_Date": null
         },
         {
             "Name_of_Project": "Landing and Animated Web Page",
-            "Description": "Created a user-friendly animated landing webpage using HTML5 and\nCSS,for learning purposes. I specialize in crafting captivating and\ndynamic landing animated webpages.\n\nBy utilizing animations, transitions, and modern design techniques, I aim\nto deliver impactful user experiences that leave a lasting impression.",
+            "Description": "Created a user-friendly animated landing webpage using HTML5 and\nCSS,for learning purposes. I specialize in crafting captivating and\ndynamic landing animated webpages.\nBy utilizing animations, transitions, and modern design techniques, I aim\nto deliver impactful user experiences that leave a lasting impression.",
             "Start_Date": null,
             "End_Date": null
         }
@@ -58,7 +58,7 @@
     "Certifications": [
         {
             "Certification_Title": "HTML5 and CSS3 basic to advance course",
-            "Issuing_Organization": "Udemy's HTML and CSS Course",
+            "Issuing_Organization": "Udemy",
             "Date_Of_Issue": null
         }
     ],
@@ -78,6 +78,8 @@
         "Animation Librarys"
     ],
     "Extracurricular_Activities": [
+        "Web Designing",
+        "Web Development",
         "Swimming",
         "Watching Anime",
         "Badminton",
