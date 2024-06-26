@@ -1,3 +1,4 @@
+import os
 import ast
 from langchain_community.utilities import SQLDatabase
 
@@ -20,7 +21,7 @@ def get_resumes_from_db(db_connection_str, query, info, field_name):
 
 def get_resume_info():
     info = dict()
-    db_connection_str = "mysql://root:@127.0.0.1/resume"
+    db_connection_str = os.environ["DB_CONNECTION"]
     
     # Personal Info
     personal_query = '''
