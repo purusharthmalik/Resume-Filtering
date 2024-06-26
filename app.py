@@ -3,7 +3,8 @@ from dotenv import load_dotenv
 from flask import Flask, render_template, request, redirect, url_for
 import fitz
 from docx import Document
-import google.generativeai as genai
+# import google.generativeai as genai
+import pandas as pd
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import text
 from datetime import datetime
@@ -17,7 +18,7 @@ app.config['GENERATED_JSON'] = 'resume.json'
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 # Configuring the database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@localhost/resume'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://shila:resume@localhost/resume'
 app.app_context().push()
 db = SQLAlchemy(app)
 
@@ -45,28 +46,33 @@ def read_document(file_path):
     else:
         print("Unsupported file format")
         return None
-    
+
+
 @app.route('/')
 def homepage():
     return render_template('home.html')
+
 
 @app.route('/candidate_button', methods=['POST', 'GET'])
 def candidate_button():
     return render_template('upload.html')
 
+
 @app.route('/hod_button', methods=['POST', 'GET'])
 def hod_button():
     return render_template('hod_form.html')
+
 
 @app.route('/filterr', methods=['POST'])
 def filterr():
     category = request.form['category']
     eligib_test = request.form['eligib_test']
-    
+
     session = db.session()
     res = session.execute(text(f'''SELECT personal_information_id from Filter''')).cursor
     session.close()
     return render_template('home.html')
+
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
@@ -79,7 +85,7 @@ def upload_file():
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
         file.save(file_path)
         document_text = read_document(file_path)
-            
+
         gem = dspy.Google("models/gemini-1.0-pro", api_key=os.environ["GOOGLE_API_KEY"])
         dspy.settings.configure(lm=gem)
 
@@ -193,15 +199,22 @@ def upload_file():
             json_resume = dspy.OutputField(desc="The JSON script of the resume.")
 
         output = dspy.Predict(Parser)
-        response = output(resume = document_text).json_resume
-        
-        text = response.replace('"Personal_Information": [],', '"Personal_Information": [{"Name": null,"Email": null,"Phone_Number": null,"Address": null,"LinkedIn_URL": null}],')
-        text = text.replace('"Work_Experience": [],', '"Work_Experience": [{"Company_Name": null,"Mode_of_Work": null,"Job_Role": null,"Start_Date": null,"End_Date": null}],')
-        text = text.replace('"Projects": [],', '"Projects": [{"Name_of_Project": null,"Description": null,"Start_Date": null,"End_Date": null}],')
-        text = text.replace('"Achievements": [],', '"Achievements": [{"Heading": null,"Description": null,"Start_Date": null,"End_Date": null}],')
-        text = text.replace('"Education": [],', '"Education": [{"Degree/Course": null,"Field_of_Study": null,"Institute": null,"Marks/Percentage/GPA": null,"Start_Date": null,"End_Date": null}],')
-        text = text.replace('"Certifications": [],', '"Certifications": [{"Certification_Title": null,"Issuing_Organization": null,"Date_Of_Issue": null}],')
-        text = text.replace('"Language_Competencies": [],', '"Language_Competencies": [{"Language": null,"Proficiency": null}],')
+        response = output(resume=document_text).json_resume
+
+        text = response.replace('"Personal_Information": [],',
+                                '"Personal_Information": [{"Name": null,"Email": null,"Phone_Number": null,"Address": null,"LinkedIn_URL": null}],')
+        text = text.replace('"Work_Experience": [],',
+                            '"Work_Experience": [{"Company_Name": null,"Mode_of_Work": null,"Job_Role": null,"Start_Date": null,"End_Date": null}],')
+        text = text.replace('"Projects": [],',
+                            '"Projects": [{"Name_of_Project": null,"Description": null,"Start_Date": null,"End_Date": null}],')
+        text = text.replace('"Achievements": [],',
+                            '"Achievements": [{"Heading": null,"Description": null,"Start_Date": null,"End_Date": null}],')
+        text = text.replace('"Education": [],',
+                            '"Education": [{"Degree/Course": null,"Field_of_Study": null,"Institute": null,"Marks/Percentage/GPA": null,"Start_Date": null,"End_Date": null}],')
+        text = text.replace('"Certifications": [],',
+                            '"Certifications": [{"Certification_Title": null,"Issuing_Organization": null,"Date_Of_Issue": null}],')
+        text = text.replace('"Language_Competencies": [],',
+                            '"Language_Competencies": [{"Language": null,"Proficiency": null}],')
 
         response_json = json.loads(text, strict=False)
         output_filename = app.config['GENERATED_JSON']
@@ -209,11 +222,35 @@ def upload_file():
             json.dump(response_json, json_file, indent=4)
         return redirect(url_for('resume_form'))
 
+
 @app.route('/resume_form')
 def resume_form():
     with open(app.config['GENERATED_JSON']) as f:
         resume_data = json.load(f)
     return render_template('resume_form.html', data=resume_data)
+
+@app.route('/analytics')
+def view_analytics():
+    df = pd.DataFrame()
+    session = db.session()
+    res = session.execute(text(f'''SELECT COUNT(id) FROM personal_information''')).cursor
+    df['total_applicant_count'] = res
+    df.to_excel('Applicant_Count.xlsx')
+    df = pd.DataFrame()
+    bac = session.execute(text(
+        f'''SELECT COUNT(field_of_study) FROM educaion_details WHERE field_of_study LIKE 'B%' or field_of_study LIKE 'b%' ''')).cursor
+    mas = session.execute(text(
+        f'''SELECT COUNT(field_of_study) FROM educaion_details WHERE field_of_study LIKE 'M%' or field_of_study LIKE 'm%' ''')).cursor
+    phd = session.execute(text(
+        f'''SELECT COUNT(field_of_study) FROM educaion_details WHERE field_of_study LIKE 'PhD%' or field_of_study LIKE 'phd%'
+            or field_of_study LIKE 'Phd%' or field_of_study LIKE 'PHD%' ''')).cursor
+
+    df['Bachelors'] = bac
+    df['Masters'] = mas
+    df['Doctorate'] = phd
+    df.to_excel('EducationLevel.xlsx')
+
+    return render_template('home.html')
 
 
 # shila takes over ...
@@ -222,17 +259,20 @@ def resume_form():
 gem = dspy.Google("models/gemini-1.0-pro", api_key=os.environ["GOOGLE_API_KEY"])
 dspy.settings.configure(lm=gem)
 
+
 class Summary(dspy.Signature):
-  """
-  You are an expert in summarizing text resumes of candidates applying for a
-  job position. The resume is given in the format of json and your task is to
-  write the summary of this candidate from this resume. Be careful to include all
-  relevant skills mentioned in the resume.
-  """   
-  resume_json = dspy.InputField(desc='This is the resume in JSON format.')
-  summary = dspy.OutputField(desc='The summary of the resume.')
+    """
+    You are an expert in summarizing text resumes of candidates applying for a
+    job position. The resume is given in the format of json and your task is to
+    write the summary of this candidate from this resume. Be careful to include all
+    relevant skills mentioned in the resume.
+    """
+    resume_json = dspy.InputField(desc='This is the resume in JSON format.')
+    summary = dspy.OutputField(desc='The summary of the resume.')
+
 
 summ = dspy.Predict(Summary)
+
 
 class PersonalInformation(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -244,16 +284,19 @@ class PersonalInformation(db.Model):
     gen_sum = db.Column(db.String(4096))
     score = db.Column(db.Double)
 
+
 class Filter(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     personal_information_id = db.Column(db.Integer, db.ForeignKey('personal_information.id'))
-    cat = db.Column(db.String(16)) # dummy. will be changed later.
-    eli = db.Column(db.String(16)) # dummy. will be changed later.
+    cat = db.Column(db.String(16))  # dummy. will be changed later.
+    eli = db.Column(db.String(16))  # dummy. will be changed later.
+
 
 class Summary(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     personal_information_id = db.Column(db.Integer, db.ForeignKey('personal_information.id'))
     summary = db.Column(db.Text)
+
 
 class WorkExperience(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -264,6 +307,7 @@ class WorkExperience(db.Model):
     end_date = db.Column(db.Date)
     description = db.Column(db.Text)
 
+
 class ProjectDetails(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     personal_information_id = db.Column(db.Integer, db.ForeignKey('personal_information.id'))
@@ -272,10 +316,12 @@ class ProjectDetails(db.Model):
     start_date = db.Column(db.Date)
     end_date = db.Column(db.Date)
 
+
 class Achievements(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     personal_information_id = db.Column(db.Integer, db.ForeignKey('personal_information.id'))
     achievement_description = db.Column(db.Text)
+
 
 class EducationDetails(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -287,6 +333,7 @@ class EducationDetails(db.Model):
     start_date = db.Column(db.Date)
     end_date = db.Column(db.Date)
 
+
 class CertificationDetails(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     personal_information_id = db.Column(db.Integer, db.ForeignKey('personal_information.id'))
@@ -294,15 +341,18 @@ class CertificationDetails(db.Model):
     date_of_issue = db.Column(db.Date)
     issuing_organization = db.Column(db.String(255))
 
+
 class Skills(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     personal_information_id = db.Column(db.Integer, db.ForeignKey('personal_information.id'))
     skill = db.Column(db.String(255))
 
+
 class ExtracurricularActivities(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     personal_information_id = db.Column(db.Integer, db.ForeignKey('personal_information.id'))
     activity = db.Column(db.String(255))
+
 
 class LanguageCompetencies(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -310,8 +360,10 @@ class LanguageCompetencies(db.Model):
     language = db.Column(db.String(255))
     proficiency_level = db.Column(db.String(255))
 
-db.drop_all() #if any changes made to the above database classes.
+
+db.drop_all()  # if any changes made to the above database classes.
 db.create_all()
+
 
 @app.route('/submit', methods=['POST'])
 def submit():
@@ -321,10 +373,11 @@ def submit():
     phone = request.form['phone']
     address = request.form['address']
     linkedin = request.form['linkedin']
-    gen_sum = summ(resume_json = open('resume.json','r').read()).summary
+    gen_sum = summ(resume_json=open('resume.json', 'r').read()).summary
 
     # Scoring to be added here (PURUUUUUUUUU)
-    personal_info = PersonalInformation(name=name, email=email, phone_number=phone, address=address, linkedin_url=linkedin, gen_sum=gen_sum, score=None)
+    personal_info = PersonalInformation(name=name, email=email, phone_number=phone, address=address,
+                                        linkedin_url=linkedin, gen_sum=gen_sum, score=None)
     db.session.add(personal_info)
     db.session.commit()  # commits here to generate the id
 
@@ -362,12 +415,12 @@ def submit():
             endcom.append(request.form[k])
 
     for i in range(len(compname)):
-        work_exp = WorkExperience(personal_information_id=personal_info.id, job_title=jobrole[i], company_name=compname[i],
-                                  start_date=datetime.strptime(startcom[i], '%m-%d-%Y') if startcom[i] else None, end_date=datetime.strptime(endcom[i], '%m-%d-%Y') if endcom[i] else None,
+        work_exp = WorkExperience(personal_information_id=personal_info.id, job_title=jobrole[i],
+                                  company_name=compname[i],
+                                  start_date=datetime.strptime(startcom[i], '%m-%d-%Y') if startcom[i] else None,
+                                  end_date=datetime.strptime(endcom[i], '%m-%d-%Y') if endcom[i] else None,
                                   description=workmode[i] + ', ' + jobtype[i])
         db.session.add(work_exp)
-
-
 
     proname = []
     prodes = []
@@ -383,12 +436,12 @@ def submit():
         if k.startswith('projectEnd'):
             proend.append(request.form[k])
 
-    
     for i in range(len(proname)):
-        project_detail = ProjectDetails(personal_information_id=personal_info.id, project_name=proname[i], description=prodes[i],
-                                        start_date=datetime.strptime(prostart[i], '%m-%d-%Y') if prostart[i] else None, end_date=datetime.strptime(proend[i], '%m-%d-%Y') if proend[i] else None)
+        project_detail = ProjectDetails(personal_information_id=personal_info.id, project_name=proname[i],
+                                        description=prodes[i],
+                                        start_date=datetime.strptime(prostart[i], '%m-%d-%Y') if prostart[i] else None,
+                                        end_date=datetime.strptime(proend[i], '%m-%d-%Y') if proend[i] else None)
         db.session.add(project_detail)
-
 
     achead = []
     acdes = []
@@ -405,9 +458,9 @@ def submit():
             acend.append(request.form[k])
 
     for i in range(len(achead)):
-        achievement = Achievements(personal_information_id=personal_info.id, achievement_description=achead[i] + ', ' + acdes[i])
+        achievement = Achievements(personal_information_id=personal_info.id,
+                                   achievement_description=achead[i] + ', ' + acdes[i])
         db.session.add(achievement)
-
 
     degree = []
     field = []
@@ -430,12 +483,14 @@ def submit():
             eduend.append(request.form[k])
 
     for i in range(len(degree)):
-        education_detail = EducationDetails(personal_information_id=personal_info.id, degree_course=degree[i], field_of_study=field[i],
-                                            institute=institute[i], marks_percentage_gpa=marks[i], start_date=datetime.strptime(edustart[i], '%m-%d-%Y') if edustart[i] else None,
+        education_detail = EducationDetails(personal_information_id=personal_info.id, degree_course=degree[i],
+                                            field_of_study=field[i],
+                                            institute=institute[i], marks_percentage_gpa=marks[i],
+                                            start_date=datetime.strptime(edustart[i], '%m-%d-%Y') if edustart[
+                                                i] else None,
                                             end_date=datetime.strptime(eduend[i], '%m-%d-%Y') if eduend[i] else None)
         db.session.add(education_detail)
 
-    
     certname = []
     certorg = []
     certdate = []
@@ -448,8 +503,10 @@ def submit():
             certdate.append(request.form[k])
 
     for i in range(len(certname)):
-        certification_detail = CertificationDetails(personal_information_id=personal_info.id, certification_title=certname[i],
-                                                    date_of_issue=datetime.strptime(certdate[i], '%m-%d-%Y') if certdate[i] else None, issuing_organization=certorg[i])
+        certification_detail = CertificationDetails(personal_information_id=personal_info.id,
+                                                    certification_title=certname[i],
+                                                    date_of_issue=datetime.strptime(certdate[i], '%m-%d-%Y') if
+                                                    certdate[i] else None, issuing_organization=certorg[i])
         db.session.add(certification_detail)
 
     # skills = request.form['skills']
@@ -472,17 +529,16 @@ def submit():
             language.append(request.form[k])
         if k.startswith('proficiency'):
             proficiency.append(request.form[k])
-    
+
     for i in range(len(language)):
-        language_competency = LanguageCompetencies(personal_information_id=personal_info.id, language = language[i],
-                                                   proficiency_level = proficiency[i])
+        language_competency = LanguageCompetencies(personal_information_id=personal_info.id, language=language[i],
+                                                   proficiency_level=proficiency[i])
         db.session.add(language_competency)
-    
+
     db.session.commit()
 
-
     return 'submitted successfully!'
-    
+
 
 if __name__ == '__main__':
     app.run(debug=True)
