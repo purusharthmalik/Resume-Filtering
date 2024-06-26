@@ -30,7 +30,8 @@ def get_resume_info():
         CONCAT('email-->', GROUP_CONCAT(email ORDER BY id)) AS email,
         CONCAT('phone_number-->', GROUP_CONCAT(phone_number ORDER BY id)) AS phone_number,
         CONCAT('address-->', GROUP_CONCAT(address ORDER BY id)) AS address,
-        CONCAT('linkedin_url-->', GROUP_CONCAT(linkedin_url ORDER BY id)) AS linkedin_url
+        CONCAT('linkedin_url-->', GROUP_CONCAT(linkedin_url ORDER BY id)) AS linkedin_url,
+        CONCAT('gen_sum-->', GROUP_CONCAT(gen_sum ORDER BY id)) AS gen_sum
     FROM 
         personal_information
     GROUP BY 

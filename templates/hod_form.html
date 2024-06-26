@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filter Candidates</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-image: linear-gradient(#cc73ff,#f4edf7);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .form-container {
+            background-image: linear-gradient(#f4edf7, #cc73ff);
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
+            max-width: 450px;
+            width: 100%;
+        }
+        .form-container h2 {
+            margin-bottom: 40px;
+            color: #666;
+            font-size: 40px;
+            text-align: center;
+            }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-size: 21px;
+            font-family: verdana;
+            -webkit-text-fill-color: black;
+        }
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 0px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: verdana;
+            margin-bottom: 12px;
+            -webkit-text-fill-color: black;
+        }
+        .form-group select:focus {
+            border-color: #007bff;
+        }
+        .form-group button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            border: none;
+            margin: 20px 0px 0px 0px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            -webkit-text-fill-color: white;
+        }
+        .form-group button:hover {
+            background-color: #0056b3;
+        }
+
+        body, h2
+        {
+            background: linear-gradient(
+                                        to right,
+                                        #7953cd 20%,
+                                        #00affa 30%,
+                                        #0190cd 70%,
+                                        #764ada 80%
+                                       );
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            -text-fill-color: transparent;
+            background-size: 500% auto;
+            animation: textShine 5s ease-in-out infinite alternate;
+        }
+
+        @keyframes textShine {
+        0% {
+            background-position: 0% 50%;
+            }
+        100% {
+            background-position: 100% 50%;
+             }
+          }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>Filter Candidates</h2>
+        <form id="employeeForm" method="post" enctype="multipart/form-data" action="{{url_for('filterr')}}">
+            <div class="form-group">
+                <label for="category">Employee Category:</label>
+                <select id="category" name="category">
+                    <option value="cat1">Category 1</option>
+                    <option value="cat2">Category 2</option>
+                    <option value="cat3">Category 3</option>
+                    <option value="cat4">Category 4</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="eligib_test">Eligibility Test:</label>
+                <select id="eligib_test" name="eligib_test">
+                    <option value="eli1">Test 1</option>
+                    <option value="eli2">Test 2</option>
+                    <option value="eli3">Test 3</option>
+                    <option value="eli4">Test 4</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <button type="submit">Submit</button>
+                <button>View Analytics</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
