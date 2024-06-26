@@ -6,6 +6,9 @@ from langchain_google_genai import GoogleGenerativeAI
 from transformers import AutoTokenizer, AutoModel
 from sklearn.metrics.pairwise import cosine_similarity
 from extract_from_db import get_resume_info
+from dotenv import load_dotenv
+
+load_dotenv()
 
 class JobDescription(dspy.Signature):
     """
@@ -44,7 +47,7 @@ class Scoring:
         self.job_description = job_description
         self.resume = resume
 
-        llm = dspy.Google("models/gemini-1.0-pro", api_key='AIzaSyCYtmimywmIjUrL3t86eTbret_l5yVp9_g')
+        llm = dspy.Google("models/gemini-1.0-pro", api_key=os.environ["GOOGLE_API_KEY"])
         dspy.settings.configure(lm=llm)
 
         output = dspy.Predict(JobDescription)
