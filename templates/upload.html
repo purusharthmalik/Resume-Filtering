@@ -10,7 +10,6 @@
         <h2>Upload your files</h2>
         <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data" id="upload-form">
             <div class="upload-box" id="upload-box">
-                <p>Drag & Drop</p>
                 <p>Supported format files</p>
                 <div class="file-icons">
                     <img src="{{ url_for('static', filename='images/doc.png') }}" alt="DOC">
@@ -18,6 +17,7 @@
                 </div>
                 <input type="file" name="file" accept=".doc,.pdf" id="file-input" multiple>
                 <label for="file-input" class="choose-files-btn">Choose Files</label>
+                <p style="font-size: smaller;">or drop files here</p>
             </div>
             <div id="file-name-display" style="font-family: Arial, sans-serif; text-decoration: none;"></div>
             <button id="uploadBtn" type="submit" class="upload-btn">

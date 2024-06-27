@@ -9,6 +9,8 @@ from sqlalchemy.sql import text
 from datetime import datetime
 import dspy
 import json
+from scoring import Scoring
+from extract_from_db import get_resume_info
 
 load_dotenv()
 app = Flask(__name__)
@@ -70,7 +72,7 @@ def filterr():
     session = db.session()
     res = session.execute(text(f'''SELECT personal_information_id from Filter''')).cursor
     session.close()
-    return render_template('home.html')
+    return render_template('filter.html')
 
 
 @app.route('/upload', methods=['POST'])
@@ -379,8 +381,6 @@ def submit():
     linkedin = request.form['linkedin']
     gen_sum = summ(resume_json=open('resume.json', 'r').read()).summary
 
-    # Scoring to be added here (PURUUUUUUUUU)
-
     personal_info = PersonalInformation(name=name, email=email, phone_number=phone, address=address,
                                         linkedin_url=linkedin, gen_sum=gen_sum, score=None)
     db.session.add(personal_info)
@@ -419,7 +419,10 @@ def submit():
         if k.startswith('endDate'):
             endcom.append(request.form[k])
 
+    scoring_we = []
     for i in range(len(compname)):
+        # For scoring
+        scoring_we.append(compname[i] + ',' + jobrole[i] + ',' + workmode[i] + ',' + jobtype[i])
         work_exp = WorkExperience(personal_information_id=personal_info.id, job_title=jobrole[i],
                                   company_name=compname[i],
                                   start_date=datetime.strptime(startcom[i], '%m-%d-%Y') if startcom[i] else None,
@@ -441,7 +444,10 @@ def submit():
         if k.startswith('projectEnd'):
             proend.append(request.form[k])
 
+    scoring_prj = []
     for i in range(len(proname)):
+        # For scoring
+        scoring_prj.append(proname[i] + ',' + prodes[i])
         project_detail = ProjectDetails(personal_information_id=personal_info.id, project_name=proname[i],
                                         description=prodes[i],
                                         start_date=datetime.strptime(prostart[i], '%m-%d-%Y') if prostart[i] else None,
@@ -462,7 +468,10 @@ def submit():
         if k.startswith('achievementEndDate'):
             acend.append(request.form[k])
 
+    scoring_ach = []
     for i in range(len(achead)):
+        # For scoring
+        scoring_ach.append(achead[i] + ', ' + acdes[i])
         achievement = Achievements(personal_information_id=personal_info.id,
                                    achievement_description=achead[i] + ', ' + acdes[i])
         db.session.add(achievement)
@@ -487,7 +496,10 @@ def submit():
         if k.startswith('endDate'):
             eduend.append(request.form[k])
 
+    scoring_ed = []
     for i in range(len(degree)):
+        # For scoring
+        scoring_ed.append(degree[i] + ',' + institute[i] + ',' + marks[i])
         education_detail = EducationDetails(personal_information_id=personal_info.id, degree_course=degree[i],
                                             field_of_study=field[i],
                                             institute=institute[i], marks_percentage_gpa=marks[i],
@@ -507,7 +519,10 @@ def submit():
         if k.startswith('issueDate'):
             certdate.append(request.form[k])
 
+    scoring_cert = []
     for i in range(len(certname)):
+        # For scoring
+        scoring_cert.append(certname[i] + ',' + certorg[i])
         certification_detail = CertificationDetails(personal_information_id=personal_info.id,
                                                     certification_title=certname[i],
                                                     date_of_issue=datetime.strptime(certdate[i], '%m-%d-%Y') if
@@ -542,7 +557,21 @@ def submit():
 
     db.session.commit()
 
-    return 'submitted successfully!'
+    # Scoring
+    resume_info = {'Summary':gen_sum,
+                   'Work Experience':scoring_we,
+                   'Projects':scoring_prj,
+                   'Achievements':scoring_ach,
+                   'Education Details':scoring_ed,
+                   'Certifications':scoring_cert,
+                   'Skills':skills,
+                   'Languages':language}
+
+    jd_text = open(r"S:\resume_parsing\job_descriptions\Prof.-CS-Sitare-University.txt", encoding='utf-8').read()
+
+    resume_score = Scoring(jd_text, resume_info).final_similarity()
+
+    return f'Your score is: {resume_score}'
 
 
 if __name__ == '__main__':

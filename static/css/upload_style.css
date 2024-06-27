@@ -1,11 +1,15 @@
+@import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@300&display=swap");
+
 body {
+    background: linear-gradient(-45deg, #ee7752, #e73c7e, #fff172);
+    background-size: 400% 400%;
+    animation: gradient 10s ease infinite;
+    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
     margin: 0;
-    background: linear-gradient(to bottom right, #1f3a93, #6dd5ed);
-    font-family: Arial, sans-serif;
+    font-family: "Quicksand", sans-serif;
 }
 
 .upload-container {
@@ -32,11 +36,11 @@ body {
 }
 
 .upload-box:hover {
-    border-color: #007bff;
+    border-color: #ff357a;
 }
 
 .upload-box.dragover {
-    border-color: #007bff;
+    border-color: #ff357a;
 }
 
 .upload-box p {
@@ -59,7 +63,8 @@ body {
 }
 
 .choose-files-btn {
-    background: #007bff;
+    background: #ff357a;
+
     border: none;
     border-radius: 5px;
     color: white;
@@ -72,11 +77,12 @@ body {
 }
 
 .choose-files-btn:hover {
-    background: #0056b3;
+    background: #fff172;
+    color: #000;
 }
 
 .upload-btn {
-    background: #007bff;
+    background: #ff357a;
     border: none;
     border-radius: 5px;
     color: white;
@@ -87,7 +93,8 @@ body {
 }
 
 .upload-btn:hover {
-    background: #0056b3;
+    background: #fff172;
+    color: #000;
 }
 
 .upload-btn {
@@ -98,4 +105,16 @@ body {
     background-color: #d3d3d3;
     color: #888;
     cursor: not-allowed;
+}
+
+@keyframes gradient {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
 }

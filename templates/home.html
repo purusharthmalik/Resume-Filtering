@@ -4,61 +4,137 @@
     <meta charset="UTF-8">
     <title>Homepage</title>
     <style>
+        @import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@300&display=swap");
+        * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Quicksand", sans-serif;
+        }
         body {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 50vh;
-            margin: 120px;
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-            font-family: Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background: #111;
+        width: 100%;
+        overflow: hidden;
+        }
+        .ring {
+        position: relative;
+        width: 500px;
+        height: 500px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        }
+        .ring i {
+        position: absolute;
+        inset: 0;
+        border: 2px solid #fff;
+        transition: 0.5s;
+        }
+        .ring i:nth-child(1) {
+        border-radius: 38% 62% 63% 37% / 41% 44% 56% 59%;
+        animation: animate 6s linear infinite;
+        }
+        .ring i:nth-child(2) {
+        border-radius: 41% 44% 56% 59%/38% 62% 63% 37%;
+        animation: animate 4s linear infinite;
+        }
+        .ring i:nth-child(3) {
+        border-radius: 41% 44% 56% 59%/38% 62% 63% 37%;
+        animation: animate2 10s linear infinite;
+        }
+        .ring:hover i {
+        border: 6px solid var(--clr);
+        filter: drop-shadow(0 0 20px var(--clr));
+        }
+        @keyframes animate {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+        }
+        @keyframes animate2 {
+        0% {
+            transform: rotate(360deg);
+        }
+        100% {
+            transform: rotate(0deg);
+        }
+        }
+        .login {
+        position: absolute;
+        width: 300px;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        gap: 20px;
+        }
+        .login h2 {
+        font-size: 2em;
+        color: #fff;
+        text-align: center;
+        }
+        .login .inputBx {
+        position: relative;
+        width: 100%;
+        }
+        .login .inputBx button {
+        position: relative;
+        width: 100%;
+        padding: 12px 20px;
+        background: transparent;
+        border: 2px solid #fff;
+        border-radius: 40px;
+        font-size: 1.2em;
+        color: #fff;
+        box-shadow: none;
+        outline: none;
+        margin: 8px;
+        }
+        .login .inputBx button {
+        width: 100%;
+        background: linear-gradient(45deg, #ff357a, #fff172);
+        border: none;
+        cursor: pointer;
+        }
+        .login .inputBx button:hover {
+        width: 100%;
+        background: linear-gradient(45deg, #fff172, #ff357a);
+        color:#000;
+        border: none;
+        cursor: pointer;
         }
 
-        form {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background: rgba(0, 0, 0, 0.1);
-            padding: 50px;
-            border-radius: 10px;
-            border-color: white;
-            border-style: dotted;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
-        }
-
-        button {
-            background: linear-gradient(135deg, #ff6a00 0%, #ee0979 100%);
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            margin: 10px;
-            border-radius: 5px;
-            font-size: 20px;
-            cursor: pointer;
-            transition: background 0.3s ease-in-out;
-        }
-
-        button:hover {
-            background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);
-        }
-
-        .navigation-text {
-            margin-top: 100px;
-            font-size: 100px;
-            font-weight: bold;
-            color: transparent;
-            -webkit-text-stroke: 2px white;
-            text-align: center;
-        }
     </style>
 </head>
 <body>
-    <form action="{{url_for('candidate_button')}}" method="post">
+    <!--ring div starts here-->
+    <div class="ring">
+        <i style="--clr:#fff;"></i>
+        <i style="--clr:#fff172;"></i>
+        <i style="--clr:#ff357a;"></i>
+        <div class="login">
+            <h2>Welcome to Christ University!</h2>
+            <form action="{{url_for('candidate_button')}}" class="inputBx" method="post">
+                <button type="submit" id="candy">I am a Candidate</button>
+                <button type="submit" formaction="{{url_for('hod_button')}}" id="fac">I am a Faculty Member</button>
+            </form>
+        </div>
+    <!--ring div ends here-->
+
+    <!-- <form action="{{url_for('candidate_button')}}" method="post">
         <button type="submit" id="candy">For Candidates</button>
         <button type="submit" formaction="{{url_for('hod_button')}}" id="fac">For Faculty</button>
-    </form>
+    </form> -->
 
-    <div class="navigation-text">Navigation Page</div>
+    <!-- <div class="navigation-text">Navigation Page</div> -->
 </body>
 </html>

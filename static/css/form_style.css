@@ -1,13 +1,15 @@
+@import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@300&display=swap");
+
 body {
     display: flex;
     justify-content: center;
     align-items: baseline;
     height: 100vh;
     margin: 0;
-    background: linear-gradient(to bottom right, #1f3a93, #6dd5ed);
+    background: linear-gradient(to bottom right, #ff357a, #fff172);
     background-attachment: fixed;
-    font-family: Arial, sans-serif;
     text-align: left;
+    font-family: "Quicksand", sans-serif;
 }
 
 .upload-container {
@@ -46,3 +48,4 @@ button {
 button:hover {
     background: #0056b3;
 }
+

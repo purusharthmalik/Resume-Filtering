@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Visualization</title>
+    <style>
+        body {
+            background-image: url("{{ wordcloud_img }}");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-blend-mode: lighten;
+        }
+        .content {
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            margin: 20px;
+            border-radius: 10px;
+        }
+        h1 {
+            font-size: 2em;
+            font-weight: bold;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <h1>Total Applicants: {{ total_applicant_count }}</h1>
+        <!-- <h2>Work Experience Years Distribution</h2> -->
+        <img src="{{ work_ex_years_img }}" alt="Work Experience Years Distribution">
+        <!-- <h2>Education Level Distribution</h2> -->
+        <img src="{{ education_levels_img }}" alt="Education Level Distribution">
+        <h6>Top Skills</h6>
+    </div>
+</body>
+</html>

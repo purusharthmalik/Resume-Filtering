@@ -1,3 +1,4 @@
+import os
 import json
 import torch
 import dspy
@@ -117,17 +118,17 @@ class Scoring:
         return 1 / (1 + abs(torch.norm(response_embedding) - torch.norm(resume_embedding)))
     
 # Driver code
-if __name__ == "__main__":
-    # Getting the job description
-    jd_text = open(r"S:\resume_parsing\job_descriptions\Prof.-CS-Sitare-University.txt", encoding='utf-8').read()
+# if __name__ == "__main__":
+#     # Getting the job description
+#     jd_text = open(r"S:\resume_parsing\job_descriptions\Prof.-CS-Sitare-University.txt", encoding='utf-8').read()
 
-    # Getting the resumes
-    resume_info = get_resume_info()
+#     # Getting the resumes
+#     resume_info = get_resume_info()
 
-    # Scoring the resumes
-    scores = dict()
-    for idx, resume in zip(resume_info.keys(), resume_info.values()):
-        resume['Summary'] = resume['Personal Information'][5]['gen_sum']
-        scores[idx] = Scoring(jd_text, resume).final_similarity()
+#     # Scoring the resumes
+#     scores = dict()
+#     for idx, resume in zip(resume_info.keys(), resume_info.values()):
+#         resume['Summary'] = resume['Personal Information'][5]['gen_sum']
+#         scores[idx] = Scoring(jd_text, resume).final_similarity()
 
-    print(scores)
+#     print(scores)
