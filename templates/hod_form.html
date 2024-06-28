@@ -14,6 +14,7 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
+            animation: textShine 5s ease-in-out infinite alternate;
         }
         .form-container {
             background-image: linear-gradient(#f4edf7, #cc73ff);
@@ -28,7 +29,20 @@
             color: #666;
             font-size: 40px;
             text-align: center;
-            }
+            background: linear-gradient(
+                to right,
+                #7953cd 20%,
+                #00affa 30%,
+                #0190cd 70%,
+                #764ada 80%
+            );
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            -webkit-text-fill-color: transparent;
+            background-size: 500% auto;
+            animation: textShine 5s ease-in-out infinite alternate;
+        }
         .form-group {
             margin-bottom: 15px;
         }
@@ -66,23 +80,6 @@
         }
         .form-group button:hover {
             background-color: #0056b3;
-        }
-
-        body, h2
-        {
-            background: linear-gradient(
-                                        to right,
-                                        #7953cd 20%,
-                                        #00affa 30%,
-                                        #0190cd 70%,
-                                        #764ada 80%
-                                       );
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            -text-fill-color: transparent;
-            background-size: 500% auto;
-            animation: textShine 5s ease-in-out infinite alternate;
         }
 
         @keyframes textShine {

@@ -1,15 +1,76 @@
-@import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@300&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
 
 body {
-    background: linear-gradient(-45deg, #ee7752, #e73c7e, #fff172);
+    background: linear-gradient(-45deg, #2b377c, #f2efe9, #cbb27f);
     background-size: 400% 400%;
     animation: gradient 10s ease infinite;
     height: 100vh;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     margin: 0;
-    font-family: "Quicksand", sans-serif;
+    font-family: "Open Sans", sans-serif;
+}
+
+nav {
+    width: 100%;
+    background: white;
+    padding: 10px 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    z-index: 1000;
+}
+
+nav .logo {
+    display: flex;
+    align-items: center;
+    margin-left: 20px;
+}
+
+nav .logo img {
+    height: 40px;
+    margin-right: 10px;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    margin: 0;
+    padding: 0;
+}
+
+nav ul li {
+    margin: 0 15px;
+    display: flex;
+    align-items: center;
+}
+
+nav ul li a {
+    color: #002d62;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s;
+    display: flex;
+    align-items: center;
+}
+
+nav ul li a:hover {
+    color: #3553ff;
+}
+
+footer {
+    width: 100%;
+    background: #2b377c;
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+    position: fixed;
+    bottom: 0;
 }
 
 .upload-container {
@@ -19,6 +80,8 @@ body {
     padding: 30px;
     text-align: center;
     width: 60%;
+    margin-top: 60px; /* Adjust to avoid overlap with the navbar */
+    margin-bottom: 60px; /* Adjust to avoid overlap with the footer */
 }
 
 .upload-container h2 {
@@ -36,11 +99,11 @@ body {
 }
 
 .upload-box:hover {
-    border-color: #ff357a;
+    border-color: #2b377c;
 }
 
 .upload-box.dragover {
-    border-color: #ff357a;
+    border-color: #2b377c;
 }
 
 .upload-box p {
@@ -63,8 +126,7 @@ body {
 }
 
 .choose-files-btn {
-    background: #ff357a;
-
+    background: #2b377c;
     border: none;
     border-radius: 5px;
     color: white;
@@ -77,12 +139,11 @@ body {
 }
 
 .choose-files-btn:hover {
-    background: #fff172;
-    color: #000;
+    background: #3553ff;
 }
 
 .upload-btn {
-    background: #ff357a;
+    background: #2b377c;
     border: none;
     border-radius: 5px;
     color: white;
@@ -93,8 +154,7 @@ body {
 }
 
 .upload-btn:hover {
-    background: #fff172;
-    color: #000;
+    background: #3553ff;
 }
 
 .upload-btn {

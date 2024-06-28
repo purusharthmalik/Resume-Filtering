@@ -2,12 +2,25 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Upload Files</title>
+    <title>Upload Resumes</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/upload_style.css') }}">
 </head>
 <body>
+    <nav>
+        <div class="logo">
+            <a target="_blank" href="https://christuniversity.in">
+                <img id="christ-logo" src="{{ url_for('static', filename='images/christ.png') }}" alt="Christ Logo">
+            </a>
+        </div>
+        <ul>
+            <li><a href="{{ url_for('homepage') }}">Home</a></li>
+            <li><a href="https://christuniversity.in/vision/">About</a></li>
+            <li><a href="https://christuniversity.in/careers">Careers</a></li>
+            <li><a href="{{ url_for('feedback') }}">Feedback</a></li>
+        </ul>
+    </nav>
     <div class="upload-container">
-        <h2>Upload your files</h2>
+        <h2>Upload Your Resume</h2>
         <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data" id="upload-form">
             <div class="upload-box" id="upload-box">
                 <p>Supported format files</p>
@@ -15,7 +28,7 @@
                     <img src="{{ url_for('static', filename='images/doc.png') }}" alt="DOC">
                     <img src="{{ url_for('static', filename='images/pdf.png') }}" alt="PDF">
                 </div>
-                <input type="file" name="file" accept=".doc,.pdf" id="file-input" multiple>
+                <input type="file" name="file" accept=".doc,.pdf,.docx" id="file-input" multiple>
                 <label for="file-input" class="choose-files-btn">Choose Files</label>
                 <p style="font-size: smaller;">or drop files here</p>
             </div>
@@ -24,9 +37,11 @@
                 <img id="processingGif" src="{{ url_for('static', filename='images/processing.gif') }}" alt="Processing" style="display: none; width: 20px; height: 20px; vertical-align: middle;">
                 <span>Upload</span>
             </button>
-            
         </form>
     </div>
+    <footer>
+        <p>&copy; 2024 Christ University. All Rights Reserved.</p>
+    </footer>
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>

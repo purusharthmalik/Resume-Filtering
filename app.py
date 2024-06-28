@@ -1,5 +1,7 @@
 import os
 from dotenv import load_dotenv
+import time
+import flask
 from flask import Flask, render_template, request, redirect, url_for
 import fitz
 from docx import Document
@@ -10,7 +12,15 @@ from datetime import datetime
 import dspy
 import json
 from scoring import Scoring
-from extract_from_db import get_resume_info
+import dash
+from dash import dcc, html
+import dash_bootstrap_components as dbc
+import plotly.express as px
+import plotly.graph_objects as go
+from wordcloud import WordCloud
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 
 load_dotenv()
 app = Flask(__name__)
@@ -22,6 +32,79 @@ os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ["DB_CONNECTION"]
 app.app_context().push()
 db = SQLAlchemy(app)
+
+#==================================THAT DASH CODE=======================================
+#=======================================================================================
+
+dash_app = dash.Dash(__name__, server=app, external_stylesheets=[dbc.themes.BOOTSTRAP], url_base_pathname='/plotly/')
+
+applicant_count_df = pd.read_excel('Applicant_Count.xlsx')
+total_applicant_count = applicant_count_df['total_applicant_count'].iloc[0]
+
+work_ex_years_df = pd.read_excel('WorkExYears.xlsx')
+work_ex_years = work_ex_years_df.iloc[0].to_dict()
+
+education_level_df = pd.read_excel('EducationLevel.xlsx')
+education_levels = education_level_df.iloc[0].to_dict()
+
+total_applicant_fig = go.Figure(go.Bar(
+    x=['Total Applicants'],
+    y=[total_applicant_count],
+    marker_color='blue'
+))
+total_applicant_fig.update_layout(
+    title_text='Total Applicants',
+    xaxis_title='',
+    yaxis_title='Count',
+    font=dict(size=10),
+    margin=dict(l=10, r=10, t=30, b=10)
+)
+
+work_ex_fig = px.bar(
+    x=list(work_ex_years.keys()),
+    y=list(work_ex_years.values()),
+    labels={'x': 'Years of Experience', 'y': 'Number of Applicants'},
+    title='Work Experience Years Distribution'
+)
+work_ex_fig.update_layout(
+    font=dict(size=10),
+    margin=dict(l=10, r=10, t=30, b=10)
+)
+
+education_level_fig = px.pie(
+    names=list(education_levels.keys()),
+    values=list(education_levels.values()),
+    title='Education Level Distribution'
+)
+education_level_fig.update_layout(
+    font=dict(size=10),
+    margin=dict(l=10, r=10, t=30, b=10)
+)
+
+wordcloud = WordCloud(background_color='white').generate_from_frequencies(education_levels)
+plt.figure(figsize=(4, 2.5))
+plt.imshow(wordcloud, interpolation='bilinear')
+plt.axis('off')
+plt.title('Top Skills', fontsize=5, loc='left')
+plt.savefig('static/wordcloud.png', dpi=1500, bbox_inches='tight')
+plt.close()
+
+dash_app.layout = dbc.Container([
+    dbc.Row([
+        dbc.Col(html.H1("Analytics Dashboard", className='text-center text-primary mb-4', style={'fontSize': '24px'}), width=12)
+    ]),
+    dbc.Row([
+        dbc.Col(dcc.Graph(figure=total_applicant_fig, config={'responsive': True}), xs=12, sm=12, md=6, lg=6, xl=6),
+        dbc.Col(dcc.Graph(figure=work_ex_fig, config={'responsive': True}), xs=12, sm=12, md=6, lg=6, xl=6)
+    ]),
+    dbc.Row([
+        dbc.Col(dcc.Graph(figure=education_level_fig, config={'responsive': True}), xs=12, sm=12, md=6, lg=6, xl=6),
+        dbc.Col(html.Img(src='/static/wordcloud.png', style={'width': '100%', 'height': 'auto'}), xs=12, sm=12, md=6, lg=6, xl=6)
+    ])
+], fluid=True)
+
+#===========================================END DASH================================================
+#===================================================================================================
 
 def read_document(file_path):
     if file_path.endswith('.pdf'):
@@ -66,13 +149,11 @@ def hod_button():
 
 @app.route('/filterr', methods=['POST'])
 def filterr():
-    category = request.form['category']
-    eligib_test = request.form['eligib_test']
-
     session = db.session()
-    res = session.execute(text(f'''SELECT personal_information_id from Filter''')).cursor
+    res = session.execute(text("SELECT p.name, p.email, p.phone_number, p.link, s.score FROM personal_information p JOIN score s WHERE p.id = s.personal_information_id ORDER BY s.score DESC;")).cursor
     session.close()
-    return render_template('filter.html')
+
+    return render_template('filter.html', data=res)
 
 
 @app.route('/upload', methods=['POST'])
@@ -214,9 +295,9 @@ def upload_file():
                             '"Education": [{"Degree/Course": null,"Field_of_Study": null,"Institute": null,"Marks/Percentage/GPA": null,"Start_Date": null,"End_Date": null}],')
         text = text.replace('"Certifications": [],',
                             '"Certifications": [{"Certification_Title": null,"Issuing_Organization": null,"Date_Of_Issue": null}],')
-        text = text.replace('"Language_Competencies": [],',
-                            '"Language_Competencies": [{"Language": null,"Proficiency": null}],')
-
+        text = text.replace('"Language_Competencies": []',
+                            '"Language_Competencies": [{"Language": null,"Proficiency": null}]')
+        # print(text)
         response_json = json.loads(text, strict=False)
         output_filename = app.config['GENERATED_JSON']
         with open(output_filename, 'w') as json_file:
@@ -238,15 +319,15 @@ def view_analytics():
 
     for count in res:
         df['total_applicant_count'] = count
-    df.to_excel('Applicant_Count.xlsx')
+    # df.to_excel('Applicant_Count.xlsx')
     df = pd.DataFrame()
     bac = session.execute(text(
-        f'''SELECT COUNT(field_of_study) FROM education_details WHERE field_of_study LIKE 'B%' or field_of_study LIKE 'b%' '''))
+        f'''SELECT COUNT(degree_course) FROM education_details WHERE degree_course LIKE 'B%' or degree_course LIKE 'b%' '''))
     mas = session.execute(text(
-        f'''SELECT COUNT(field_of_study) FROM education_details WHERE field_of_study LIKE 'M%' or field_of_study LIKE 'm%' '''))
+        f'''SELECT COUNT(degree_course) FROM education_details WHERE degree_course LIKE 'M%' or degree_course LIKE 'm%' '''))
     phd = session.execute(text(
-        f'''SELECT COUNT(field_of_study) FROM education_details WHERE field_of_study LIKE 'PhD%' or field_of_study LIKE 'phd%'
-            or field_of_study LIKE 'Phd%' or field_of_study LIKE 'PHD%' '''))
+        f'''SELECT COUNT(degree_course) FROM education_details WHERE degree_course LIKE 'PhD%' or degree_course LIKE 'phd%'
+            or degree_course LIKE 'Phd%' or degree_course LIKE 'PHD%' '''))
 
     for count in bac:
         df['Bachelors'] = count
@@ -254,9 +335,13 @@ def view_analytics():
         df['Masters'] = count
     for count in phd:
         df['Doctorate'] = count
-    df.to_excel('EducationLevel.xlsx')
+    # df.to_excel('EducationLevel.xlsx')
 
-    return render_template('home.html')
+    return flask.redirect('/plotly/')
+
+@app.route('/feedback')
+def feedback():
+    return render_template('feedback.html')
 
 
 # shila takes over ...
@@ -288,7 +373,7 @@ class PersonalInformation(db.Model):
     address = db.Column(db.Text)
     linkedin_url = db.Column(db.String(255))
     gen_sum = db.Column(db.String(4096))
-    score = db.Column(db.Double)
+    link = db.Column(db.String(255))
 
 
 class Filter(db.Model):
@@ -366,8 +451,12 @@ class LanguageCompetencies(db.Model):
     language = db.Column(db.String(255))
     proficiency_level = db.Column(db.String(255))
 
+class Score(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    personal_information_id = db.Column(db.Integer, db.ForeignKey('personal_information.id'))
+    score = db.Column(db.Double)
 
-# db.drop_all()  # if any changes made to the above database classes.
+db.drop_all()  # if any changes made to the above database classes.
 db.create_all()
 
 
@@ -378,11 +467,11 @@ def submit():
     email = request.form['email']
     phone = request.form['phone']
     address = request.form['address']
-    linkedin = request.form['linkedin']
+    linkedin = request.form['linkedin'].lower()
     gen_sum = summ(resume_json=open('resume.json', 'r').read()).summary
 
     personal_info = PersonalInformation(name=name, email=email, phone_number=phone, address=address,
-                                        linkedin_url=linkedin, gen_sum=gen_sum, score=None)
+                                        linkedin_url=linkedin, gen_sum=gen_sum, link=None)
     db.session.add(personal_info)
     db.session.commit()  # commits here to generate the id
 
@@ -555,8 +644,6 @@ def submit():
                                                    proficiency_level=proficiency[i])
         db.session.add(language_competency)
 
-    db.session.commit()
-
     # Scoring
     resume_info = {'Summary':gen_sum,
                    'Work Experience':scoring_we,
@@ -570,9 +657,13 @@ def submit():
     jd_text = open(r"S:\resume_parsing\job_descriptions\Prof.-CS-Sitare-University.txt", encoding='utf-8').read()
 
     resume_score = Scoring(jd_text, resume_info).final_similarity()
+    db.session.add(Score(personal_information_id=personal_info.id, 
+                         score=resume_score))
 
-    return f'Your score is: {resume_score}'
+    db.session.commit()
 
+    # time.sleep(5)
+    return render_template('home.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
