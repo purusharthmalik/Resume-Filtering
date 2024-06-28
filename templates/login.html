@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Faculty Login</title>
+</head>
+<body>
+    <form action="{{ url_for('hod_button') }}">
+        <label for="fname">Username:</label><br>
+        <input type="text" id="fname" name="fname"><br>
+        <label for="pass">Password:</label><br>
+        <input type="password" id="pass" name="pass">
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>

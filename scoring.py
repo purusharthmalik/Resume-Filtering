@@ -2,8 +2,6 @@ import os
 import json
 import torch
 import dspy
-from langchain.prompts import PromptTemplate
-from langchain_google_genai import GoogleGenerativeAI
 from transformers import AutoTokenizer, AutoModel
 from sklearn.metrics.pairwise import cosine_similarity
 from extract_from_db import get_resume_info

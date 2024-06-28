@@ -96,6 +96,18 @@ h2 {
     opacity: 1;
 }
 
+.progress {
+    height: 20px;
+    margin-bottom: 20px;
+}
+
+.progress-bar {
+    width: 0%;
+    height: 100%;
+    background-color: #002d62;
+    transition: width 0.5s ease;
+}
+
 @keyframes gradient {
     0% {
         background-position: 0% 50%;

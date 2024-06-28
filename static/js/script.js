@@ -53,15 +53,20 @@ document.addEventListener("DOMContentLoaded", function() {
     const sections = document.querySelectorAll(".form-section");
     const nextButtons = document.querySelectorAll(".next-btn");
     const prevButtons = document.querySelectorAll(".prev-btn");
+    const progressBar = document.querySelector(".progress-bar");
     let currentSectionIndex = 0;
 
     sections[currentSectionIndex].classList.add("active");
+    updateProgressBar();
 
     nextButtons.forEach((button, index) => {
         button.addEventListener("click", () => {
-            sections[currentSectionIndex].classList.remove("active");
-            currentSectionIndex = Math.min(currentSectionIndex + 1, sections.length - 1);
-            sections[currentSectionIndex].classList.add("active");
+            if (validateSection(sections[currentSectionIndex])) {
+                sections[currentSectionIndex].classList.remove("active");
+                currentSectionIndex = Math.min(currentSectionIndex + 1, sections.length - 1);
+                sections[currentSectionIndex].classList.add("active");
+                updateProgressBar();
+            }
         });
     });
 
@@ -70,6 +75,25 @@ document.addEventListener("DOMContentLoaded", function() {
             sections[currentSectionIndex].classList.remove("active");
             currentSectionIndex = Math.max(currentSectionIndex - 1, 0);
             sections[currentSectionIndex].classList.add("active");
+            updateProgressBar();
         });
     });
+
+    function updateProgressBar() {
+        const progress = (currentSectionIndex + 1) / sections.length * 100;
+        progressBar.style.width = `${progress}%`;
+        progressBar.setAttribute("aria-valuenow", progress);
+    }
+
+    function validateSection(section) {
+        const inputs = section.querySelectorAll("input, textarea");
+        for (const input of inputs) {
+            if (!input.checkValidity()) {
+                input.reportValidity();
+                // Change to false if data validation is needed for every field
+                return true;
+            }
+        }
+        return true;
+    }
 });

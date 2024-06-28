@@ -33,6 +33,9 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ["DB_CONNECTION"]
 app.app_context().push()
 db = SQLAlchemy(app)
 
+# Storing the filepath
+resume_filepath = ""
+
 #==================================THAT DASH CODE=======================================
 #=======================================================================================
 
@@ -119,7 +122,7 @@ def read_document(file_path):
         except Exception as e:
             print(f"Error reading PDF: {e}")
             return None
-    elif file_path.endswith('.docx'):
+    elif file_path.endswith('.docx') or file_path.endswith('.doc'):
         try:
             document = Document(file_path)
             text = "\n".join([para.text for para in document.paragraphs])
@@ -155,6 +158,9 @@ def filterr():
 
     return render_template('filter.html', data=res)
 
+@app.route('/login',  methods=['POST', 'GET'])
+def login():
+    return render_template('login.html')
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
@@ -164,7 +170,10 @@ def upload_file():
     if file.filename == '':
         return 'No selected file'
     if file:
+        global resume_filepath
+        resume_filepath = os.path.join(os.environ["UPLOAD_FILE_PATH"], file.filename)
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+        print(resume_filepath)
         file.save(file_path)
         document_text = read_document(file_path)
 
@@ -471,7 +480,7 @@ def submit():
     gen_sum = summ(resume_json=open('resume.json', 'r').read()).summary
 
     personal_info = PersonalInformation(name=name, email=email, phone_number=phone, address=address,
-                                        linkedin_url=linkedin, gen_sum=gen_sum, link=None)
+                                        linkedin_url=linkedin, gen_sum=gen_sum, link=resume_filepath)
     db.session.add(personal_info)
     db.session.commit()  # commits here to generate the id
 
