@@ -24,7 +24,7 @@ import matplotlib.pyplot as plt
 
 load_dotenv()
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = 'uploads'
+app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['GENERATED_JSON'] = 'resume.json'
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
@@ -150,7 +150,7 @@ def hod_button():
     return render_template('hod_form.html')
 
 
-@app.route('/filterr', methods=['POST'])
+@app.route('/filterr', methods=['POST', 'GET'])
 def filterr():
     session = db.session()
     res = session.execute(text("SELECT p.name, p.email, p.phone_number, p.link, s.score FROM personal_information p JOIN score s WHERE p.id = s.personal_information_id ORDER BY s.score DESC;")).cursor
@@ -171,9 +171,8 @@ def upload_file():
         return 'No selected file'
     if file:
         global resume_filepath
-        resume_filepath = os.path.join(os.environ["UPLOAD_FILE_PATH"], file.filename)
+        resume_filepath = "uploads/" + file.filename
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
-        print(resume_filepath)
         file.save(file_path)
         document_text = read_document(file_path)
 
@@ -465,7 +464,7 @@ class Score(db.Model):
     personal_information_id = db.Column(db.Integer, db.ForeignKey('personal_information.id'))
     score = db.Column(db.Double)
 
-db.drop_all()  # if any changes made to the above database classes.
+# db.drop_all()  # if any changes made to the above database classes.
 db.create_all()
 
 
