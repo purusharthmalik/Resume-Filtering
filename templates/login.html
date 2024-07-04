@@ -3,14 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <title>Faculty Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/upload_style.css') }}">
 </head>
 <body>
-    <form action="{{ url_for('hod_button') }}">
-        <label for="fname">Username:</label><br>
-        <input type="text" id="fname" name="fname"><br>
-        <label for="pass">Password:</label><br>
-        <input type="password" id="pass" name="pass">
-        <button type="submit">Submit</button>
-    </form>
+    <nav>
+        <div class="logo">
+            <a target="_blank" href="https://christuniversity.in">
+                <img id="christ-logo" src="{{ url_for('static', filename='images/christ.png') }}" alt="Christ Logo">
+            </a>
+        </div>
+        <ul>
+            <li><a href="{{ url_for('homepage') }}">Home</a></li>
+            <li><a href="https://christuniversity.in/vision/">About</a></li>
+            <li><a href="https://christuniversity.in/careers">Careers</a></li>
+            <li><a href="{{ url_for('feedback') }}">Feedback</a></li>
+        </ul>
+    </nav>
+    <div class="login-container">
+        <h3>Please enter your credentials</h3>
+        <form action="{{ url_for('hod_button') }}" method="post" class="form">
+            <label for="username">Username</label><br>
+            <input type="text" id="username" name="username" required><br>
+            <label for="password">Password</label><br>
+            <input type="password" id="password" name="password" required><br>
+            <button class="upload-btn" id="uploadBtn" type="submit">Submit</button>
+        </form>
+    </div>
+    <footer>
+        <p>&copy; 2024 Christ University. All Rights Reserved.</p>
+    </footer>
 </body>
 </html>
