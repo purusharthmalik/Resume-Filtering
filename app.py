@@ -193,16 +193,18 @@ def hod_button():
     session = db.session()
     name = request.form.get('username')
     password = request.form.get('password')
-    ### Validate the entered credentials in the login form @Shila
-    return render_template('hod_form.html')
-
+    res = session.execute(text(f"SELECT username FROM faculty WHERE username LIKE '{name}' AND password LIKE '{password}'"))
+    try:
+        list([dict(row._mapping) for row in res][0].values())[0]
+        return render_template('hod_form.html')
+    except:
+        pass #to-do: write the code to display wrong credentials - enter again... @puru
 
 @app.route('/filterr', methods=['POST', 'GET'])
 def filterr():
     session = db.session()
     res = session.execute(text("SELECT p.name, p.email, p.phone_number, p.link, s.score FROM personal_information p JOIN score s WHERE p.id = s.personal_information_id ORDER BY s.score DESC;")).cursor
     session.close()
-
     return render_template('filter.html', data=res)
 
 @app.route('/login',  methods=['POST', 'GET'])
