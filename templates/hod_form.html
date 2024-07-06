@@ -6,6 +6,12 @@
     <title>Filter Candidates</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/upload_style.css') }}">
 </head>
+<script>
+    function updateValue(element) {
+        let value = element.value;
+        element.nextElementSibling.textContent = value.toString().concat("%");
+    }
+</script>
 <body>
     <nav>
         <div class="logo">
@@ -15,8 +21,7 @@
         </div>
         <ul>
             <li><a href="{{ url_for('homepage') }}">Home</a></li>
-            <li><a href="https://christuniversity.in/vision/">About</a></li>
-            <li><a href="https://christuniversity.in/careers">Careers</a></li>
+            <li><a href="{{url_for('view_analytics')}}">Analytics Dashboard</a></li>
             <li><a href="{{ url_for('feedback') }}">Feedback</a></li>
         </ul>
     </nav>
@@ -57,6 +62,12 @@
                         <option value="wk5">4 - 5 years</option>
                         <option value="wk6">more than 5 years</option>
                     </select>
+
+                    <div class="weight-bar">
+                        <input type="range" id="bar1" name="bar1" min="0" max="100" step="1" value="50" oninput="updateValue(this)">
+                        <span class="value">50%</span>
+                    </div>
+
                 </div>
                 <div class="form-group">
                     <label for="qual">Highest Qualification</label>
@@ -66,6 +77,11 @@
                         <option value="eli3">PhD</option>
                         <option value="eli4">Post Doc</option>
                     </select>
+
+                    <div class="weight-bar">
+                        <input type="range" id="bar2" name="bar2" min="0" max="100" step="1" value="50" oninput="updateValue(this)">
+                        <span class="value">50%</span>
+                    </div>
                 </div>
             </div>
             <div class="form-group">
@@ -74,7 +90,6 @@
             </div>
             <div class="form-group">
                 <button id="uploadBtn" class="upload-btn" type="submit">Submit</button>
-                <button id="uploadBtn" class="upload-btn" type="submit" formaction="{{url_for('view_analytics')}}">View Analytics</button>
             </div>
         </form>
     </div>

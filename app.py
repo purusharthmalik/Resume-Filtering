@@ -1,7 +1,9 @@
+import math
 import os
 from dotenv import load_dotenv
+import random
 import flask
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, jsonify, render_template, request, redirect, url_for
 import fitz
 from docx import Document
 import pandas as pd
@@ -196,6 +198,26 @@ def hod_button():
     ### Validate the entered credentials in the login form @Shila
     return render_template('hod_form.html')
 
+def generate_vectors(jd_vec, dist):
+    def random_unit_vector():
+        x = random.uniform(-1, 1)
+        y = random.uniform(-1, 1)
+        z = random.uniform(-1, 1)
+        length = math.sqrt(x * x + y * y + z * z)
+        
+        if length == 0:
+            return random_unit_vector()  # Prevent division by zero
+        
+        return [x / length, y / length, z / length]
+
+    unit_vec = random_unit_vector()
+    new_vec = [
+        jd_vec[0] + unit_vec[0] * dist,
+        jd_vec[1] + unit_vec[1] * dist,
+        jd_vec[2] + unit_vec[2] * dist,
+    ]
+    
+    return new_vec
 
 @app.route('/filterr', methods=['POST', 'GET'])
 def filterr():
@@ -203,7 +225,18 @@ def filterr():
     res = session.execute(text("SELECT p.name, p.email, p.phone_number, p.link, s.score FROM personal_information p JOIN score s WHERE p.id = s.personal_information_id ORDER BY s.score DESC;")).cursor
     session.close()
 
-    return render_template('filter.html', data=res)
+    # Creating vectors for all the resumes
+    jd_vec = [10, 10, 10]
+
+    dist = 1
+    resume_vecs = []
+
+    for _ in list(res):
+        resume_vecs.append(generate_vectors(jd_vec, dist))
+        dist += 1
+
+    parsed_res = json.dumps(list(res))
+    return render_template('filter.html', data=[res, parsed_res, json.dumps(resume_vecs)])
 
 @app.route('/login',  methods=['POST', 'GET'])
 def login():
