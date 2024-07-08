@@ -206,7 +206,17 @@ textarea {
 
 label {
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 1px;
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
+}
+.checkbox-group input[type="checkbox"] {
+    margin-right: 5px;
 }
 
 /* End HOD Form CSS */

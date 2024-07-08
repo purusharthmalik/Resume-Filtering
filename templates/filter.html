@@ -24,32 +24,6 @@
         }
     </style>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <!-- Script for creating random vectors -->
-    <script>
-            function generateVectors(jd_vec, dist) {
-                // Generate random unit vector
-                function randomUnitVector() {
-                    let x = Math.random() * 2 - 1;
-                    let y = Math.random() * 2 - 1;
-                    let z = Math.random() * 2 - 1;
-                    let length = Math.sqrt(x * x + y * y + z * z);
-
-                    if (length === 0) return randomUnitVector(); // Prevent division by zero
-
-                    return [x / length, y / length, z / length];
-                }
-
-                // Create new vector
-                let unitVec = randomUnitVector();
-                let newVec = [
-                    jd_vec[0] + unitVec[0] * dist,
-                    jd_vec[1] + unitVec[1] * dist,
-                    jd_vec[2] + unitVec[2] * dist,
-                ];
-
-                return newVec;
-            }
-    </script>
 </head>
 <body>
     <h1><center>Resume Scores</center></h1>
@@ -60,6 +34,7 @@
             <th>Phone Number</th>
             <th>Resume Link</th>
             <th>Score</th>
+            <th>Social Media Analysis</th>
         </tr>
         {% for row in data[0] %}
         <tr>
@@ -67,7 +42,8 @@
             <td>{{ row[1] }}</td>
             <td>{{ row[2] }}</td>
             <td><a href="{{ url_for('static', filename=row[3]) }}" target="_blank">{{ row[0] }}</a></td>
-            <td>{{ row[4] }}</td>   
+            <td>{{ row[4] }}</td>
+            <td><a href="{{ url_for('static', filename='social_media.html')}}" target="_blank">{{ row[0] }}</a></td>
         </tr>
         {% endfor %}
     </table>
@@ -113,9 +89,9 @@
 
         // Loading names from Flask
         const resumes = JSON.parse('{{ data[1] | safe }}');
-        let names = []
+        let names = [];
 
-        for (let i=0; i<resumes.length; i++){
+        for (let i = 0; i < resumes.length; i++) {
             names.push(resumes[i][0]);
         }
 
@@ -130,10 +106,10 @@
                 endX: 10,
                 endY: 10,
                 endZ: 10
-            }]
-        const rand_vects = JSON.parse("{{ data[2] | safe}}")
+            }];
+        const rand_vects = JSON.parse("{{ data[2] | safe }}");
         
-        for (let i=0; i<rand_vects.length; i++){
+        for (let i = 0; i < rand_vects.length; i++) {
             let vect_info = {
                 name: names[i],
                 startX: 0,
@@ -150,45 +126,6 @@
         console.log(vectors);
 
         plot3DVectors(vectors);
-
     </script>
-
-<!-- <div id="calculator" style="width: 100%; height: 500px;"></div>
-
-Desmos Embed Script
-<script src="https://www.desmos.com/api/v1.4/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
-<script>
-    var elt = document.getElementById('calculator');
-    var calculator = Desmos.GraphingCalculator(elt, {
-        expressions: false,
-        settingsMenu: false
-    });
-
-    // Function to plot vectors
-    function plotVectors(vectors) {
-        vectors.forEach((vector, index) => {
-            const startX = vector.startX;
-            const startY = vector.startY;
-            const endX = vector.endX;
-            const endY = vector.endY;
-            
-            // Plot the vector as a parametric equation
-            calculator.setExpression({
-                id: 'vector' + index,
-                latex: `\\left(${startX} + t\\left(${endX - startX}\\right), ${startY} + t\\left(${endY - startY}\\right)\\right)`,
-                parametricDomain: { min: 0, max: 1 }
-            });
-        });
-    }
-
-    // Example: Passing vectors dynamically
-    const vectors = [
-        { startX: 0, startY: 0, endX: 3, endY: 4 },
-        { startX: 0, startY: 0, endX: -2, endY: 2 },
-        { startX: 0, startY: 0, endX: 1, endY: -3 }
-    ];
-
-    plotVectors(vectors);
-</script> -->
 </body>
 </html>
