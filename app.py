@@ -6,6 +6,8 @@ import random
 import flask
 from flask import Flask, jsonify, render_template, request, redirect, url_for
 import fitz
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_groq import ChatGroq
 from docx import Document
 import pandas as pd
 from flask_sqlalchemy import SQLAlchemy
@@ -18,11 +20,11 @@ import dash
 from dash import dcc, html
 import dash_bootstrap_components as dbc
 import plotly.express as px
-import plotly.graph_objects as go
-from wordcloud import WordCloud
+# import plotly.graph_objects as go
+# from wordcloud import WordCloud
 import matplotlib
 matplotlib.use('Agg')
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 load_dotenv()
 app = Flask(__name__)
@@ -159,20 +161,20 @@ def read_document(file_path):
     if file_path.endswith('.pdf'):
         try:
             pdf_document = fitz.open(file_path)
-            text = ""
+            txt = ""
             for page_num in range(pdf_document.page_count):
                 page = pdf_document.load_page(page_num)
-                text += page.get_text() + "\n"
+                txt += page.get_text() + "\n"
             pdf_document.close()
-            return text
+            return txt
         except Exception as e:
             print(f"Error reading PDF: {e}")
             return None
     elif file_path.endswith('.docx') or file_path.endswith('.doc'):
         try:
             document = Document(file_path)
-            text = "\n".join([para.text for para in document.paragraphs])
-            return text
+            txt = "\n".join([para.text for para in document.paragraphs])
+            return txt
         except Exception as e:
             print(f"Error reading Word document: {e}")
             return None
@@ -199,9 +201,10 @@ def hod_button():
     
     res = session.execute(text(f"SELECT username FROM faculty WHERE username LIKE '{name}' AND password LIKE '{password}'"))
     try:
+        # noinspection PyStatementEffect,PyProtectedMember
         list([dict(row._mapping) for row in res][0].values())[0]
         return render_template('hod_form.html')
-    except:
+    except (Exception,):
         pass #to-do: write the code to display wrong credentials - enter again... @puru
 
 def generate_vectors(jd_vec, dist):
@@ -323,8 +326,8 @@ def upload_file():
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
         file.save(file_path)
         document_text = read_document(file_path)
-        gem = dspy.Google("models/gemini-1.0-pro", api_key=os.environ["GOOGLE_API_KEY"])
-        dspy.settings.configure(lm=gem)
+        # gem = dspy.Google("models/gemini-1.0-pro", api_key=os.environ["GOOGLE_API_KEY"])
+        # dspy.settings.configure(lm=gem)
 
         class Parser(dspy.Signature):
             """
@@ -438,22 +441,22 @@ def upload_file():
         output = dspy.Predict(Parser)
         response = output(resume=document_text).json_resume
 
-        text = response.replace('"Personal_Information": [],',
+        txt = response.replace('"Personal_Information": [],',
                                 '"Personal_Information": [{"Name": null,"Email": null,"Phone_Number": null,"Address": null,"LinkedIn_URL": null}],')
-        text = text.replace('"Work_Experience": [],',
+        txt = txt.replace('"Work_Experience": [],',
                             '"Work_Experience": [{"Company_Name": null,"Mode_of_Work": null,"Job_Role": null,"Start_Date": null,"End_Date": null}],')
-        text = text.replace('"Projects": [],',
+        txt = txt.replace('"Projects": [],',
                             '"Projects": [{"Name_of_Project": null,"Description": null,"Start_Date": null,"End_Date": null}],')
-        text = text.replace('"Achievements": [],',
+        txt = txt.replace('"Achievements": [],',
                             '"Achievements": [{"Heading": null,"Description": null,"Start_Date": null,"End_Date": null}],')
-        text = text.replace('"Education": [],',
+        txt = txt.replace('"Education": [],',
                             '"Education": [{"Degree/Course": null,"Field_of_Study": null,"Institute": null,"Marks/Percentage/GPA": null,"Start_Date": null,"End_Date": null}],')
-        text = text.replace('"Certifications": [],',
+        txt = txt.replace('"Certifications": [],',
                             '"Certifications": [{"Certification_Title": null,"Issuing_Organization": null,"Date_Of_Issue": null}],')
-        text = text.replace('"Language_Competencies": []',
+        txt = txt.replace('"Language_Competencies": []',
                             '"Language_Competencies": [{"Language": null,"Proficiency": null}]')
-        # print(text)
-        response_json = json.loads(text, strict=False)
+
+        response_json = json.loads(txt, strict=False)
         output_filename = app.config['GENERATED_JSON']
         with open(output_filename, 'w') as json_file:
             json.dump(response_json, json_file, indent=4)
@@ -466,6 +469,8 @@ def resume_form():
         resume_data = json.load(f)
     return render_template('resume_form.html', data=resume_data)
 
+
+# noinspection PyProtectedMember
 @app.route('/analytics', methods=['POST', 'GET'])
 def view_analytics():
     session = db.session()
@@ -492,7 +497,7 @@ def view_analytics():
     res = session.execute(text('''SELECT time_stamp FROM personal_information'''))
     ress = [dict(row._mapping) for row in res]
     df = pd.DataFrame(ress)
-    # df.to_excel('Time.xlsx', index=False)
+    df.to_excel('Time.xlsx', index=False)
 
     res = session.execute(text('''SELECT personal_information_id, SUM(DATEDIFF(end_date, start_date)) AS total_workex
         FROM work_experience GROUP BY personal_information_id'''))
@@ -501,7 +506,7 @@ def view_analytics():
     df = df.apply(pd.to_numeric)
     df['experience_years'] = df['total_workex'] // 365
     df = df.groupby('experience_years').size().reset_index(name='count')
-    # df.to_excel('Work.xlsx', index=False)
+    df.to_excel('Work.xlsx', index=False)
 
     res = session.execute(text('''SELECT skill, COUNT(*) AS frequency FROM skills GROUP BY  skill ORDER BY frequency DESC'''))
     res = [dict(row._mapping) for row in res]
@@ -523,18 +528,37 @@ gem = dspy.Google("models/gemini-1.0-pro", api_key=os.environ["GOOGLE_API_KEY"])
 dspy.settings.configure(lm=gem)
 
 
-class Summary(dspy.Signature):
-    """
-    You are an expert in summarizing text resumes of candidates applying for a
-    job position. The resume is given in the format of json and your task is to
-    write the summary of this candidate from this resume. Be careful to include all
-    relevant skills mentioned in the resume.
-    """
-    resume_json = dspy.InputField(desc='This is the resume in JSON format.')
-    summary = dspy.OutputField(desc='The summary of the resume.')
+# class Summary(dspy.Signature):
+#     """
+#     You are an expert in summarizing text resumes of candidates applying for a
+#     job position. The resume is given in the format of json and your task is to
+#     write the summary of this candidate from this resume. Be careful to include all
+#     relevant skills mentioned in the resume.
+#     """
+#     resume_json = dspy.InputField(desc='This is the resume in JSON format.')
+#     summary = dspy.OutputField(desc='The summary of the resume.')
+
+def summ(rj):
+    chat = ChatGroq(
+        temperature=0,
+        model="llama3-70b-8192",
+        api_key="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"
+    )
+    system = '''You are an expert to fetch all the keywords from a given resume.
+                You will be given a resume in json format.
+                Read the entire resume and figure out all the keywords.
+                Be careful that your list MUST include ALL the keywords mentioned in the resume.
+                Start with 1.
+             '''
+    human = "{resume}"
+    this = {"resume":rj}
+    prompt = ChatPromptTemplate.from_messages([("system", system), ("human", human)])
+    chain = prompt | chat
+    kws = chain.invoke(this).content
+    return ' '.join([match.strip() for match in re.findall(r'\d+\.(.*)', kws)])
 
 
-summ = dspy.Predict(Summary)
+# summ = dspy.Predict(Summary)
 
 
 class PersonalInformation(db.Model):
@@ -645,7 +669,7 @@ def submit():
     phone = request.form['phone']
     address = request.form['address']
     linkedin = request.form['linkedin'].lower()
-    gen_sum = summ(resume_json=open('resume.json', 'r').read()).summary
+    gen_sum = summ(open('resume.json', 'r').read())
 
     personal_info = PersonalInformation(name=name, email=email, phone_number=phone, address=address,
                                         linkedin_url=linkedin, gen_sum=gen_sum, link=resume_filepath,
@@ -660,7 +684,7 @@ def submit():
     try:
         cat = request.form['cat']
         eli = request.form['eli']
-    except:
+    except (Exception,):
         cat = None
         eli = None
     filt = Filter(cat=cat, eli=eli)
@@ -832,7 +856,7 @@ def submit():
                    'Skills':skills,
                    'Languages':language}
 
-    jd_text = open(r"S:\resume_parsing\job_descriptions\Prof.-CS-Sitare-University.txt", encoding='utf-8').read()
+    jd_text = open(r"C:\StrangerCodes\Resume\job_descriptions\Prof.-CS-Sitare-University.txt", encoding='utf-8').read()
 
     resume_score = Scoring(jd_text, resume_info).final_similarity()
     db.session.add(Score(personal_information_id=personal_info.id, 
