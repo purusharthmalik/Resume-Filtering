@@ -1,44 +1,124 @@
 import os
 import json
+import groq
 import torch
-import dspy
 from transformers import AutoTokenizer, AutoModel
 from sklearn.metrics.pairwise import cosine_similarity
-from extract_from_db import get_resume_info
 from dotenv import load_dotenv
 
 load_dotenv()
 
-class JobDescription(dspy.Signature):
-    """
-        You are a professional job description parsing agent.
-        All the points are mandatory. You can not skip any point. Create key names in JSON as per the given key names.
-        Perform the following steps for the given job description:
-        1. Extract me the Summary of the job (mandatory) (Key Name - Summary).
-        2. Extract me Work Experience details with keys being (Key Name - Work Experience):
-        a. Job Role
-        b. Job Type (Full Time or Intern)
-        3. Extract me Project details with keys being (Key Name - Projects):
-        a. Name of Project with short introduction of it, if mentioned
-        b. Description of project.
-        4. Extract me Achievement details with keys being (Key Name - Achievements):
-        a. Heading with short introduction of it, if mentioned
-        b. Description of the heading.
-        5. Extract me Education Details with keys being (mandatory) (Key Name - Education Details):
-        a. Degree/Course
-        b. Field of Study (note: usually written alongside degree, extract from 'degree' key if that is the case)
-        c. Institute
-        d. Marks/Percentage/GPA
-        6. Extract me Certification details with keys being (Key Name - Certifications):
-        a. Certification Title
-        b. Issuing Organization
-        7. List me all the skills needed from the following document (mandatory) (Key Name - Skills).
-        8. List me all the language competencies from the following document (Key Name - Languages).
-        You are to generate a valid JSON script as output. Properly deal with trailing commas while formatting the output file.
-    """
-    jd = dspy.InputField(desc='This is the job description.')
-    summary = dspy.OutputField(desc='JSON script for the job description.')
-            
+def jd_parser(jd_text):
+    client = groq.Groq(api_key=os.environ["CHATGROQ_API_KEY"])
+
+    chat_completion = client.chat.completions.create(
+    messages=[
+                {
+                    "role": "user",
+                    "content": f"seed=33"
+                    f"You are a professional job description parsing agent. "
+                    f"So do as follows: "
+                    f"1. Generate a Summary of the job description."
+                    f"2. Extract the Work Experience requirements with keys being: "
+                    f"a. Company name (Optional) "
+                    f"b. Job Role "
+                    f"c. Job Type (Full Time or Intern) "
+                    f"3. Extract the Project details requirements with keys being: "
+                    f"a. Name of Project with short introduction of it, if mentioned "
+                    f"b. Description of project. "
+                    f"4. Extract the Achievement details requirements with keys being: "
+                    f"a. Heading with short introduction of it, if mentioned "
+                    f"b. Description of the heading. "
+                    f"5. Extract the Education details requirements with keys being: "
+                    f"a. Degree/Course"
+                    f"b. Field of Study (note: usually written alongside degree, extract from 'degree' key if that is the case) "
+                    f"c. Institute"
+                    f"d. Marks/Percentage/GPA"
+                    f"6. Extract the Certification details requirements with keys being: "
+                    f"a. Certification Title "
+                    f"b. Issuing Organization "
+                    f"7. List all the skills from the following document. "
+                    f"8. List me all the language competencies from the following document. "
+                    f"You are to generate a valid JSON script as output. Properly deal with trailing commas while formatting the output file. Do not write any other note or introductory sentence, stick to generating only the valid json."
+                    f"Strictly don't write any additional notes whatsoever."
+                    f"When generating output strictly follow this format: "
+                    f"1st line: 'Here is the JSON output', No space and next line till last line: Entire JSON content"
+                    f"Take this empty json format and fill it up: "
+                    f'{{ '
+                    f'"Summary": "", '
+                    f'"Work_Experience": [ '
+                    f'{{ '
+                    f'"Company_Name": "", '
+                    f'"Job_Role": "", '
+                    f'"Job_Type": "", '
+                    f'}} '
+                    f'], '
+                    f'"Projects": [ '
+                    f'{{ '
+                    f'"Name_of_Project": "", '
+                    f'"Description": "", '
+                    f'}} '
+                    f'], '
+                    f'"Achievements": [ '
+                    f'{{ '
+                    f'"Heading": "", '
+                    f'"Description": "", '
+                    f'}} '
+                    f'], '
+                    f'"Education": [ '
+                    f'{{ '
+                    f'"Degree/Course": "", '
+                    f'"Field_of_Study": "", '
+                    f'"Institute": "", '
+                    f'"Marks/Percentage/GPA": "", '
+                    f'}} '
+                    f'], '
+                    f'"Certifications": [ '
+                    f'{{ '
+                    f'"Certification_Title": "", '
+                    f'"Issuing_Organization": "", '
+                    f'}} '
+                    f'], '
+                    f'"Skills": [], '
+                    f'"Language_Competencies": [ '
+                    f'{{ '
+                    f'"Language": "", '
+                    f'"Proficiency": "" '
+                    f'}} '
+                    f'] '
+                    f'}} '
+                    f"Job Description: {jd_text}",
+                }
+            ],
+            model="llama3-70b-8192",
+        )
+
+    text = chat_completion.choices[0].message.content
+
+    start_index = text.find('{')
+    text = text[start_index:]
+    last_brace_index = text.rfind('}')
+    if last_brace_index != -1:
+        text = text[:last_brace_index + 1]
+
+    text = text.replace('"Personal_Information": [],',
+                                '"Personal_Information": [{"Name": null,"Email": null,"Phone_Number": null,"Address": null,"LinkedIn_URL": null}],')
+    text = text.replace('"Work_Experience": [],',
+                            '"Work_Experience": [{"Company_Name": null,"Mode_of_Work": null,"Job_Role": null,"Start_Date": null,"End_Date": null}],')
+    text = text.replace('"Projects": [],',
+                            '"Projects": [{"Name_of_Project": null,"Description": null,"Start_Date": null,"End_Date": null}],')
+    text = text.replace('"Achievements": [],',
+                            '"Achievements": [{"Heading": null,"Description": null,"Start_Date": null,"End_Date": null}],')
+    text = text.replace('"Education": [],',
+                            '"Education": [{"Degree/Course": null,"Field_of_Study": null,"Institute": null,"Marks/Percentage/GPA": null,"Start_Date": null,"End_Date": null}],')
+    text = text.replace('"Certifications": [],',
+                            '"Certifications": [{"Certification_Title": null,"Issuing_Organization": null,"Date_Of_Issue": null}],')
+    text = text.replace('"Language_Competencies": []',
+                            '"Language_Competencies": [{"Language": null,"Proficiency": null}]')
+    # print(text)
+    response_json = json.loads(text, strict=True)
+    return response_json
+
 class Scoring:
 
     def __init__(self, job_description, resume):
@@ -46,15 +126,9 @@ class Scoring:
         self.job_description = job_description
         self.resume = resume
 
-        llm = dspy.Google("models/gemini-1.0-pro", api_key=os.environ["GOOGLE_API_KEY"])
-        dspy.settings.configure(lm=llm)
-
-        output = dspy.Predict(JobDescription)
-        response = json.loads(output(jd = self.job_description).summary[8:-4])
+        response = jd_parser(self.job_description)
+        print(response)
         self.response = self.remove_nulls(response)
-
-        return None
-
 
     # Function to remove null values from the output
     def remove_nulls(self, value):
@@ -86,6 +160,19 @@ class Scoring:
                 euclidean = self.frobenius_sim(response_embedding, resume_embedding)
                 
                 similarity_arr[field] = (alpha * cosine + (1 - alpha) * euclidean).item()
+
+            elif field in self.resume.keys():
+                response_field = str(self.response['Summary'])
+                resume_field = str(self.resume[field])
+
+                response_embedding = self.get_embeddings(response_field, tokenizer, model)
+                resume_embedding = self.get_embeddings(resume_field, tokenizer, model)
+                
+                cosine = self.cosine_sim(response_embedding, resume_embedding)
+                euclidean = self.frobenius_sim(response_embedding, resume_embedding)
+                
+                similarity_arr[field] = (alpha * cosine + (1 - alpha) * euclidean).item()
+
             else:
                 similarity_arr[field] = 0
                 
@@ -108,7 +195,7 @@ class Scoring:
     
     # Function to calculate the cosine similarity
     def cosine_sim(self, response_embedding, resume_embedding):
-        similarity = cosine_similarity(resume_embedding.numpy(), resume_embedding.numpy())
+        similarity = cosine_similarity(response_embedding.numpy(), resume_embedding.numpy())
         return 1. if similarity[0][0] > 1 else similarity[0][0]
     
     # Function to calculate the Frobenius norm

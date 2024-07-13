@@ -6,6 +6,10 @@ import random
 import flask
 from flask import Flask, jsonify, render_template, request, redirect, url_for
 import fitz
+import groq
+from docx import Document
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_groq import ChatGroq
 from docx import Document
 import pandas as pd
 from flask_sqlalchemy import SQLAlchemy
@@ -18,8 +22,6 @@ import dash
 from dash import dcc, html
 import dash_bootstrap_components as dbc
 import plotly.express as px
-import plotly.graph_objects as go
-from wordcloud import WordCloud
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -168,7 +170,7 @@ def read_document(file_path):
         except Exception as e:
             print(f"Error reading PDF: {e}")
             return None
-    elif file_path.endswith('.docx') or file_path.endswith('.doc'):
+    elif file_path.endswith(('.docx', '.doc')):
         try:
             document = Document(file_path)
             text = "\n".join([para.text for para in document.paragraphs])
@@ -179,7 +181,6 @@ def read_document(file_path):
     else:
         print("Unsupported file format")
         return None
-
 
 @app.route('/')
 def homepage():
@@ -201,7 +202,7 @@ def hod_button():
     try:
         list([dict(row._mapping) for row in res][0].values())[0]
         return render_template('hod_form.html')
-    except:
+    except (Exception):
         pass #to-do: write the code to display wrong credentials - enter again... @puru
 
 def generate_vectors(jd_vec, dist):
@@ -323,122 +324,135 @@ def upload_file():
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
         file.save(file_path)
         document_text = read_document(file_path)
-        gem = dspy.Google("models/gemini-1.0-pro", api_key=os.environ["GOOGLE_API_KEY"])
-        dspy.settings.configure(lm=gem)
 
-        class Parser(dspy.Signature):
-            """
-            You are a professional resume parsing agent.
-            So do as follows:
-            1. Extract Personal Information of the applicant with keys being:
-            a. Extract name of the applicant.
-            b. Extract email of the applicant.
-            c. Extract phone number of the applicant.
-            d. Exract address of the applicant.
-            e. Extract linkedin url of the applicant (Add https:// in front of the link if it is not already present).
-            2. Extract me the Summary of the applicant if mentioned.
-            3. Extract me Work Experience details with keys being:
-            a. Company name
-            b. Mode of work (Offline/Online/Hybrid)
-            c. Job Role
-            d. Job Type (Full Time or Intern)
-            e. Start Date
-            f. End Date.
-            4. Extract me Project details with keys being:
-            a. Name of Project with short introduction of it, if mentioned
-            b. Description of project.
-            c. Start Date if any.
-            d. End Date if any
-            5. Extract me Achievement details with keys being:
-            a. Heading with short introduction of it, if mentioned
-            b. Description of the heading.
-            c. Start Date if any.
-            d. End Date if any:
-            6. Extract me Education details with keys being:
-            a. Degree/Course
-            b. Field of Study (note: usually written alongside degree, extract from 'degree' key if that is the case)
-            c. Institute
-            d. Marks/Percentage/GPA
-            e. Start Date if any
-            f. End Date/ Passing Year
-            7. Extract me Certification details with keys being:
-            a. Certification Title
-            b. Issuing Organization
-            c. Date Of Issue
-            8. List me all the skills from the following document.
-            9. List me all the extracurricular activities/hobbies from the following document.
-            10. List me all the language competencies from the following document.
-            You are to generate a valid JSON script as output. Properly deal with trailing commas while formatting the output file.
-            Take this empty json format and fill it up:
-            {
-                "Personal_Information": {{
-                    "Name": "",
-                    "Email": "",
-                    "Phone_Number": "",
-                    "Address": "",
-                    "LinkedIn_URL": ""
-                }},
-                "Summary": "",
-                "Work_Experience": [
-                    {{
-                        "Company_Name": "",
-                        "Mode_of_Work": "",
-                        "Job_Role": "",
-                        "Job_Type": "",
-                        "Start_Date": "",
-                        "End_Date": "",
-                    }}
-                ],
-                "Projects": [
-                    {{
-                        "Name_of_Project": "",
-                        "Description": "",
-                        "Start_Date": "",
-                        "End_Date": ""
-                    }}
-                ],
-                "Achievements": [
-                    {{
-                        "Heading": "",
-                        "Description": "",
-                        "Start_Date": "",
-                        "End_Date": ""
-                    }}
-                ],
-                "Education": [
-                    {{
-                        "Degree/Course": "",
-                        "Field_of_Study": "",
-                        "Institute": "",
-                        "Marks/Percentage/GPA": "",
-                        "Start_Date": "",
-                        "End_Date": ""
-                    }}
-                ],
-                "Certifications": [
-                    {{
-                        "Certification_Title": "",
-                        "Issuing_Organization": "",
-                        "Date_Of_Issue": ""
-                    }}
-                ],
-                "Skills": [],
-                "Extracurricular_Activities": [],
-                "Language_Competencies": [
-                    {{
-                        "Language": "",
-                        "Proficiency": ""
-                    }}
-                ]
-            }"""
+        client = groq.Groq(api_key=os.environ["CHATGROQ_API_KEY"])
 
-            resume = dspy.InputField(desc="This is the resume.")
-            json_resume = dspy.OutputField(desc="The JSON script of the resume.")
+        chat_completion = client.chat.completions.create(
+            messages=[
+                {
+                    "role": "user",
+                    "content": f"seed=33"
+                            f"You are a professional resume parsing agent. "
+                            f"So do as follows: "
+                            f"1. Extract Personal Information of the applicant with keys being: "
+                            f"a. Extract name of the applicant. "
+                            f"b. Extract email of the applicant. "
+                            f"c. Extract phone number of the applicant. "
+                            f"d. Extract address of the applicant. "
+                            f"e. Extract linkedin url of the applicant (Add https:// in front of the link if it is not already present). "
+                            f"2. Extract me the Summary of the applicant if mentioned. "
+                            f"3. Extract me Work Experience details with keys being: "
+                            f"a. Company name "
+                            f"b. Mode of work (Offline/Online/Hybrid) "
+                            f"c. Job Role "
+                            f"d. Job Type (Full Time or Intern) "
+                            f"e. Start Date "
+                            f"f. End Date. "
+                            f"4. Extract me Project details with keys being: "
+                            f"a. Name of Project with short introduction of it, if mentioned "
+                            f"b. Description of project. "
+                            f"c. Start Date if any. "
+                            f"d. End Date if any "
+                            f"5. Extract me Achievement details with keys being: "
+                            f"a. Heading with short introduction of it, if mentioned "
+                            f"b. Description of the heading. "
+                            f"c. Start Date if any. "
+                            f"d. End Date if any: "
+                            f"6. Extract me Education details with keys being: "
+                            f"a. Degree/Course "
+                            f"b. Field of Study (note: usually written alongside degree, extract from 'degree' key if that is the case) "
+                            f"c. Institute "
+                            f"d. Marks/Percentage/GPA "
+                            f"e. Start Date if any "
+                            f"f. End Date/ Passing Year "
+                            f"7. Extract me Certification details with keys being: "
+                            f"a. Certification Title "
+                            f"b. Issuing Organization "
+                            f"c. Date Of Issue "
+                            f"8. List me all the skills from the following document. "
+                            f"9. List me all the extracurricular activities/hobbies from the following document. "
+                            f"10. List me all the language competencies from the following document. "
+                            f"You are to generate a valid JSON script as output. Properly deal with trailing commas while formatting the output file. Do not write any other note or introductory sentence, stick to generating only the valid json."
+                            f"Strictly don't write any additional notes whatsover."
+                            f"When generating output strictly follow this format: "
+                            f"1st line: 'Here is the JSON output', No space and next line till last line: Entire JSON content"
+                            f"Take this empty json format and fill it up: "
+                            f'{{ '
+                            f'"Personal_Information": {{ '
+                            f'"Name": "", '
+                            f'"Email": "", '
+                            f'"Phone_Number": "", '
+                            f'"Address": "", '
+                            f'"LinkedIn_URL": "" '
+                            f'}}, '
+                            f'"Summary": "", '
+                            f'"Work_Experience": [ '
+                            f'{{ '
+                            f'"Company_Name": "", '
+                            f'"Mode_of_Work": "", '
+                            f'"Job_Role": "", '
+                            f'"Job_Type": "", '
+                            f'"Start_Date": "", '
+                            f'"End_Date": "" '
+                            f'}} '
+                            f'], '
+                            f'"Projects": [ '
+                            f'{{ '
+                            f'"Name_of_Project": "", '
+                            f'"Description": "", '
+                            f'"Start_Date": "", '
+                            f'"End_Date": "" '
+                            f'}} '
+                            f'], '
+                            f'"Achievements": [ '
+                            f'{{ '
+                            f'"Heading": "", '
+                            f'"Description": "", '
+                            f'"Start_Date": "", '
+                            f'"End_Date": "" '
+                            f'}} '
+                            f'], '
+                            f'"Education": [ '
+                            f'{{ '
+                            f'"Degree/Course": "", '
+                            f'"Field_of_Study": "", '
+                            f'"Institute": "", '
+                            f'"Marks/Percentage/GPA": "", '
+                            f'"Start_Date": "", '
+                            f'"End_Date": "" '
+                            f'}} '
+                            f'], '
+                            f'"Certifications": [ '
+                            f'{{ '
+                            f'"Certification_Title": "", '
+                            f'"Issuing_Organization": "", '
+                            f'"Date_Of_Issue": "" '
+                            f'}} '
+                            f'], '
+                            f'"Skills": [], '
+                            f'"Extracurricular_Activities": [], '
+                            f'"Language_Competencies": [ '
+                            f'{{ '
+                            f'"Language": "", '
+                            f'"Proficiency": "" '
+                            f'}} '
+                            f'] '
+                            f'}} '
+                            f"Resume of applicant: {document_text}, if no texts are written after 'Resume of applicant:', return me the empty json template back.",
+                }
+            ],
+            model="llama3-70b-8192",
+        )
 
-        output = dspy.Predict(Parser)
-        response = output(resume=document_text).json_resume
+        text = chat_completion.choices[0].message.content
 
-        text = response.replace('"Personal_Information": [],',
+        start_index = text.find('{')
+        text = text[start_index:]
+        last_brace_index = text.rfind('}')
+        if last_brace_index != -1:
+            text = text[:last_brace_index + 1]
+
+        text = text.replace('"Personal_Information": [],',
                                 '"Personal_Information": [{"Name": null,"Email": null,"Phone_Number": null,"Address": null,"LinkedIn_URL": null}],')
         text = text.replace('"Work_Experience": [],',
                             '"Work_Experience": [{"Company_Name": null,"Mode_of_Work": null,"Job_Role": null,"Start_Date": null,"End_Date": null}],')
@@ -492,7 +506,7 @@ def view_analytics():
     res = session.execute(text('''SELECT time_stamp FROM personal_information'''))
     ress = [dict(row._mapping) for row in res]
     df = pd.DataFrame(ress)
-    # df.to_excel('Time.xlsx', index=False)
+    df.to_excel('Time.xlsx', index=False)
 
     res = session.execute(text('''SELECT personal_information_id, SUM(DATEDIFF(end_date, start_date)) AS total_workex
         FROM work_experience GROUP BY personal_information_id'''))
@@ -501,7 +515,7 @@ def view_analytics():
     df = df.apply(pd.to_numeric)
     df['experience_years'] = df['total_workex'] // 365
     df = df.groupby('experience_years').size().reset_index(name='count')
-    # df.to_excel('Work.xlsx', index=False)
+    df.to_excel('Work.xlsx', index=False)
 
     res = session.execute(text('''SELECT skill, COUNT(*) AS frequency FROM skills GROUP BY  skill ORDER BY frequency DESC'''))
     res = [dict(row._mapping) for row in res]
@@ -519,23 +533,24 @@ def feedback():
 # shila takes over ...
 # <======================================================================================================================>
 
-gem = dspy.Google("models/gemini-1.0-pro", api_key=os.environ["GOOGLE_API_KEY"])
-dspy.settings.configure(lm=gem)
-
-
-class Summary(dspy.Signature):
-    """
-    You are an expert in summarizing text resumes of candidates applying for a
-    job position. The resume is given in the format of json and your task is to
-    write the summary of this candidate from this resume. Be careful to include all
-    relevant skills mentioned in the resume.
-    """
-    resume_json = dspy.InputField(desc='This is the resume in JSON format.')
-    summary = dspy.OutputField(desc='The summary of the resume.')
-
-
-summ = dspy.Predict(Summary)
-
+def summ(rj):
+    chat = ChatGroq(
+        temperature=0,
+        model="llama3-70b-8192",
+        api_key=os.environ["CHATGROQ_API_KEY"]
+    )
+    system = '''You are an expert to fetch all the keywords from a given resume.
+                You will be given a resume in json format.
+                Read the entire resume and figure out all the keywords.
+                Be careful that your list MUST include ALL the keywords mentioned in the resume.
+                Start with 1.
+             '''
+    human = "{resume}"
+    this = {"resume":rj}
+    prompt = ChatPromptTemplate.from_messages([("system", system), ("human", human)])
+    chain = prompt | chat
+    kws = chain.invoke(this).content
+    return ' '.join([match.strip() for match in re.findall(r'\d+\.(.*)', kws)])
 
 class PersonalInformation(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -645,7 +660,7 @@ def submit():
     phone = request.form['phone']
     address = request.form['address']
     linkedin = request.form['linkedin'].lower()
-    gen_sum = summ(resume_json=open('resume.json', 'r').read()).summary
+    gen_sum = summ(rj=open('resume.json', 'r').read())
 
     personal_info = PersonalInformation(name=name, email=email, phone_number=phone, address=address,
                                         linkedin_url=linkedin, gen_sum=gen_sum, link=resume_filepath,
@@ -835,6 +850,7 @@ def submit():
     jd_text = open(r"S:\resume_parsing\job_descriptions\Prof.-CS-Sitare-University.txt", encoding='utf-8').read()
 
     resume_score = Scoring(jd_text, resume_info).final_similarity()
+    print(resume_score)
     db.session.add(Score(personal_information_id=personal_info.id, 
                          score=resume_score))
 
