@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Resume Form</title>
+    <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/form_style.css') }}">
+    <link rel="stylesheet" href="style1_form.css">
+    <!-- <link rel="stylesheet" href="form_style.css"> -->
+</head>
+<body>
+    <div class="upload-container container mt-5 p-5 bg-light rounded shadow">
+        <h1 class="text-center border-bottom pb-4">Edit your Details</h1>
+        <div class="progress">
+            <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+        <form action="/submit" method="post" class="needs-validation" novalidate>
+            <div class="form-section">
+                <h2 class="border-bottom pb-2">Personal Information</h2>
+                <div class="form-group">
+                    <label for="name">Name:</label>
+                    <input type="text" class="form-control" id="name" name="name" value="{{ data['Personal_Information']['Name'] }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" class="form-control" id="email" name="email" value="{{ data['Personal_Information']['Email'] }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone Number:</label>
+                    <input type="text" class="form-control" id="phone" name="phone" value="{{ data['Personal_Information']['Phone_Number'] }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="address">Address:</label>
+                    <input type="text" class="form-control" id="address" name="address" value="{{ data['Personal_Information']['Address'] }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="linkedin">LinkedIn URL:</label>
+                    <input type="url" class="form-control" id="linkedin" name="linkedin" value="{{ data['Personal_Information']['LinkedIn_URL'] }}" required>
+                </div>
+                <button type="button" class="btn btn-primary next-btn position-right">Next</button>
+            </div>
+
+            <div class="form-section">
+                <h2 class="border-bottom pb-2">Summary</h2>
+                <div class="form-group">
+                    <textarea id="summary" class="form-control" name="summary" rows="4" required>{{ data['Summary'] }}</textarea>
+                </div>
+                <button type="button" class="btn btn-secondary prev-btn">Previous</button>
+                <button type="button" class="btn btn-primary next-btn position-right">Next</button>
+            </div>
+
+            <div class="form-section">
+                <h2 class="border-bottom pb-2">Work Experience</h2>
+                <div id="workExperience">
+                    {% for experience in data['Work_Experience'] %}
+                    <div class="experience-entry">
+                        <div class="form-group">
+                            <label for="companyName{{ loop.index }}">Company Name:</label>
+                            <input type="text" class="form-control" id="companyName{{ loop.index }}" name="companyName{{ loop.index }}" value="{{ experience['Company_Name'] }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="modeOfWork{{ loop.index }}">Mode of Work:</label>
+                            <input type="text" class="form-control" id="modeOfWork{{ loop.index }}" name="modeOfWork{{ loop.index }}" value="{{ experience['Mode_of_Work'] }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="jobRole{{ loop.index }}">Job Role:</label>
+                            <input type="text" class="form-control" id="jobRole{{ loop.index }}" name="jobRole{{ loop.index }}" value="{{ experience['Job_Role'] }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="jobType{{ loop.index }}">Job Type:</label>
+                            <input type="text" class="form-control" id="jobType{{ loop.index }}" name="jobType{{ loop.index }}" value="{{ experience['Job_Type'] }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="startDate{{ loop.index }}">Start Date:</label>
+                            <input type="date" class="form-control" id="startDate{{ loop.index }}" name="startDate{{ loop.index }}" value="{{ experience['Start_Date'] }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="endDate{{ loop.index }}">End Date:</label>
+                            <input type="date" class="form-control" id="endDate{{ loop.index }}" name="endDate{{ loop.index }}" value="{{ experience['End_Date'] }}" required>
+                        </div>
+                        <button type="button" class="btn btn-danger remove-experience-btn">Remove</button>
+                    </div>
+                    {% endfor %}
+                </div>
+                <button type="button" class="btn btn-secondary prev-btn">Previous</button>
+                <button type="button" class="btn btn-success add-experience-btn">Add Experience</button>
+                <button type="button" class="btn btn-primary next-btn position-right">Next</button>
+            </div>
+
+            <div class="form-section">
+                <h2 class="border-bottom pb-2">Project Details</h2>
+                <div id="projectDetails">
+                    {% for project in data['Projects'] %}
+                    <div class="project-entry">
+                        <div class="form-group">
+                            <label for="projectName{{ loop.index0 }}">Project Name:</label>
+                            <input type="text" class="form-control" id="projectName{{ loop.index0 }}" name="projectName{{ loop.index0 }}" value="{{ project['Name_of_Project'] }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="projectDescription{{ loop.index0 }}">Description:</label>
+                            <textarea id="projectDescription{{ loop.index0 }}" class="form-control" name="projectDescription{{ loop.index0 }}" rows="4" required>{{ project['Description'] }}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="projectStart{{ loop.index0 }}">Start Date:</label>
+                            <input type="date" class="form-control" id="projectStart{{ loop.index0 }}" name="projectStart{{ loop.index0 }}" value="{{ project['Start_Date'] }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="projectEnd{{ loop.index0 }}">End Date:</label>
+                            <input type="date" class="form-control" id="projectEnd{{ loop.index0 }}" name="projectEnd{{ loop.index0 }}" value="{{ project['End_Date'] }}" required>
+                        </div>
+                        <button type="button" class="btn btn-danger remove-project-btn">Remove</button>
+                    </div>
+                    {% endfor %}
+                </div>
+                <button type="button" class="btn btn-secondary prev-btn">Previous</button>
+                <button type="button" class="btn btn-success add-project-btn">Add Project</button>
+                <button type="button" class="btn btn-primary next-btn position-right">Next</button>
+            </div>
+
+            <div class="form-section">
+                <h2 class="border-bottom pb-2">Achievements</h2>
+                <div id="achievements">
+                    {% for achievement in data['Achievements'] %}
+                    <div class="achievement-entry">
+                        <div class="form-group">
+                            <label for="achievementHeading{{ loop.index }}">Heading:</label>
+                            <input type="text" class="form-control" id="achievementHeading{{ loop.index }}" name="achievementHeading{{ loop.index }}" value="{{ achievement['Heading'] }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="achievementDescription{{ loop.index }}">Description:</label>
+                            <textarea id="achievementDescription{{ loop.index }}" class="form-control" name="achievementDescription{{ loop.index }}" rows="4" required>{{ achievement['Description'] }}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="achievementStartDate{{ loop.index }}">Start Date:</label>
+                            <input type="date" class="form-control" id="achievementStartDate{{ loop.index }}" name="achievementStartDate{{ loop.index }}" value="{{ achievement['Start_Date'] }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="achievementEndDate{{ loop.index }}">End Date:</label>
+                            <input type="date" class="form-control" id="achievementEndDate{{ loop.index }}" name="achievementEndDate{{ loop.index }}" value="{{ achievement['End_Date'] }}" required>
+                        </div>
+                        <button type="button" class="btn btn-danger remove-achievement-btn">Remove</button>
+                    </div>
+                    {% endfor %}
+                </div>
+                <button type="button" class="btn btn-secondary prev-btn">Previous</button>
+                <button type="button" class="btn btn-success add-achievement-btn">Add Achievement</button>
+                <button type="button" class="btn btn-primary next-btn position-right">Next</button>
+            </div>
+
+            <div class="form-section">
+                <h2 class="border-bottom pb-2">Education Details</h2>
+                <div id="educationDetails">
+                    {% for education in data['Education'] %}
+                    <div class="education-entry">
+                        <div class="form-group">
+                            <label for="degree{{ loop.index }}">Degree:</label>
+                            <input type="text" class="form-control" id="degree{{ loop.index }}" name="degree{{ loop.index }}" value="{{ education['Degree'] }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="field{{ loop.index }}">Field of Study:</label>
+                            <input type="text" class="form-control" id="field{{ loop.index }}" name="field{{ loop.index }}" value="{{ education['Field_of_Study'] }}" required>
+                        </div> 
+                        <div class="form-group">
+                            <label for="institute{{ loop.index }}">Institute Name:</label>
+                            <input type="text" class="form-control" id="institute{{ loop.index }}" name="institute{{ loop.index }}" value="{{ education['Institute_Name'] }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="marks{{ loop.index0 }}">Marks/Percentage/GPA:</label>
+                            <input type="text" class="form-control" id="marks{{ loop.index0 }}" name="marks{{ loop.index0 }}" value="{{ education['Marks/Percentage/GPA'] }}" required>
+                        </div>                    
+                        <div class="form-group">
+                            <label for="startDate{{ loop.index }}">Start Date:</label>
+                            <input type="date" class="form-control" id="startDate{{ loop.index }}" name="startDate{{ loop.index }}" value="{{ education['Start_Date'] }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="endDate{{ loop.index }}">End Date:</label>
+                            <input type="date" class="form-control" id="endDate{{ loop.index }}" name="endDate{{ loop.index }}" value="{{ education['End_Date'] }}" required>
+                        </div>
+                        <button type="button" class="btn btn-danger remove-education-btn">Remove</button>
+                    </div>
+                    {% endfor %}
+                </div>
+                <button type="button" class="btn btn-secondary prev-btn">Previous</button>
+                <button type="button" class="btn btn-success add-education-btn">Add Education</button>
+                <button type="button" class="btn btn-primary next-btn position-right">Next</button>
+            </div>
+
+            <div class="form-section">
+                <h2 class="border-bottom pb-2">Certification Details</h2>
+                <div id="certificationDetails">
+                    {% for certification in data['Certifications'] %}
+                    <div class="certification-entry">
+                        <div class="form-group">
+                            <label for="certificationTitle{{ loop.index }}">Certification Title:</label>
+                            <input type="text" class="form-control" id="certificationTitle{{ loop.index }}" name="certificationTitle{{ loop.index }}" value="{{ certification['Certification_Name'] }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="issuingOrganization{{ loop.index }}">Issuing_Organization:</label>
+                            <input type="text" class="form-control" id="issuingOrganization{{ loop.index }}" name="issuingOrganization{{ loop.index }}" value="{{ certification['Certification_Authority'] }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="issueDate{{ loop.index }}">Date of Issue:</label>
+                            <input type="date" class="form-control" id="issueDate{{ loop.index }}" name="issueDate{{ loop.index }}" value="{{ certification['Certification_Date'] }}" required>
+                        </div>
+                        <button type="button" class="btn btn-danger remove-certification-btn">Remove</button>
+                    </div>
+                    {% endfor %}
+                </div>
+                <button type="button" class="btn btn-secondary prev-btn">Previous</button>
+                <button type="button" class="btn btn-success add-certification-btn">Add Certification</button>
+                <button type="button" class="btn btn-primary next-btn position-right">Next</button>
+            </div>
+
+            <div class="form-section">
+                <h2 class="border-bottom pb-2">Skills</h2>
+                <div class="form-group">
+                    <textarea id="skills" class="form-control" name="skills" rows="4" required>{{ data['Skills'] | join(", ") }}</textarea>
+                </div>
+                <button type="button" class="btn btn-secondary prev-btn">Previous</button>
+                <button type="button" class="btn btn-primary next-btn position-right">Next</button>
+            </div>
+
+            <div class="form-section">
+                <h2 class="border-bottom pb-2">Extracurricular Activities</h2>
+                <div class="form-group">
+                    <textarea id="activities" class="form-control" name="activities" rows="4" required>{{ data['Extracurricular_Activities'] | join(", ") }}</textarea>
+                </div>
+                <button type="button" class="btn btn-secondary prev-btn">Previous</button>
+                <button type="button" class="btn btn-primary next-btn position-right">Next</button>
+            </div>
+
+            <div class="form-section">
+                <h2 class="border-bottom pb-2">Language Competencies</h2>
+                <div id="languageCompetencies">
+                    {% for language in data['Languages'] %}
+                    <div class="language-entry">
+                        <div class="form-group">
+                            <label for="language{{ loop.index }}">Language:</label>
+                            <input type="text" class="form-control" id="language{{ loop.index }}" name="language{{ loop.index }}" value="{{ language['Language'] }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="proficiency{{ loop.index }}">Proficiency Level:</label>
+                            <input type="text" class="form-control" id="proficiency{{ loop.index }}" name="proficiency{{ loop.index }}" value="{{ language['Proficiency'] }}" required>
+                        </div>
+                        <button type="button" class="btn btn-danger remove-language-btn">Remove</button>
+                    </div>
+                    {% endfor %}
+                </div>
+                <button type="button" class="btn btn-secondary prev-btn">Previous</button>
+                <button type="button" class="btn btn-success add-language-btn">Add Language</button>
+                <button type="submit" class="btn btn-primary next-btn position-right">Submit</button>
+            </div>
+                    
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const progressBar = document.querySelector('.progress-bar');
+            const formSections = document.querySelectorAll('.form-section');
+            const nextButtons = document.querySelectorAll('.next-btn');
+            const prevButtons = document.querySelectorAll('.prev-btn');
+            const addExperienceButton = document.querySelector('.add-experience-btn');
+            const addProjectButton = document.querySelector('.add-project-btn');
+            const addAchievementButton = document.querySelector('.add-achievement-btn');
+            const addEducationButton = document.querySelector('.add-education-btn');
+            const addCertificationButton = document.querySelector('.add-certification-btn');
+            const addLanguageButton = document.querySelector('.add-language-btn');
+            let currentSectionIndex = 0;
+
+            function showSection(index) {
+                formSections.forEach((section, i) => {
+                    section.style.display = i === index ? 'block' : 'none';
+                });
+                const progress = (index / (formSections.length - 1)) * 100;
+                progressBar.style.width = progress + '%';
+                progressBar.setAttribute('aria-valuenow', progress);
+            }
+
+            nextButtons.forEach((button, index) => {
+                button.addEventListener('click', () => {
+                    if (currentSectionIndex < formSections.length - 1) {
+                        currentSectionIndex++;
+                        showSection(currentSectionIndex);
+                    }
+                });
+            });
+
+            prevButtons.forEach((button, index) => {
+                button.addEventListener('click', () => {
+                    if (currentSectionIndex > 0) {
+                        currentSectionIndex--;
+                        showSection(currentSectionIndex);
+                    }
+                });
+            });
+
+            addExperienceButton.addEventListener('click', () => {
+                const workExperienceContainer = document.getElementById('workExperience');
+                const experienceCount = workExperienceContainer.getElementsByClassName('experience-entry').length;
+                const newExperience = document.createElement('div');
+                newExperience.className = 'experience-entry';
+                newExperience.innerHTML = `
+                    <div class="form-group">
+                        <label for="companyName${experienceCount}">Company Name:</label>
+                        <input type="text" class="form-control" id="companyName${experienceCount}" name="companyName${experienceCount}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="modeOfWork${experienceCount}">Mode of Work:</label>
+                        <input type="text" class="form-control" id="modeOfWork${experienceCount}" name="modeOfWork${experienceCount}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="jobRole${experienceCount}">Job Role:</label>
+                        <input type="text" class="form-control" id="jobRole${experienceCount}" name="jobRole${experienceCount}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="jobType${experienceCount}">Job Type:</label>
+                        <input type="text" class="form-control" id="jobType${experienceCount}" name="jobType${experienceCount}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="startDate${experienceCount}">Start Date:</label>
+                        <input type="date" class="form-control" id="startDate${experienceCount}" name="startDate${experienceCount}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="endDate${experienceCount}">End Date:</label>
+                        <input type="date" class="form-control" id="endDate${experienceCount}" name="endDate${experienceCount}" required>
+                    </div>
+                    <button type="button" class="btn btn-danger remove-experience-btn">Remove</button>
+                `;
+                workExperienceContainer.appendChild(newExperience);
+                attachRemoveButtons();
+            });
+
+            addProjectButton.addEventListener('click', () => {
+                const projectDetailsContainer = document.getElementById('projectDetails');
+                const projectCount = projectDetailsContainer.getElementsByClassName('project-entry').length;
+                const newProject = document.createElement('div');
+                newProject.className = 'project-entry';
+                newProject.innerHTML = `
+                    <div class="form-group">
+                        <label for="projectName${projectCount}">Project Name:</label>
+                        <input type="text" class="form-control" id="projectName${projectCount}" name="projectName${projectCount}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="projectDescription${projectCount}">Description:</label>
+                        <textarea id="projectDescription${projectCount}" class="form-control" name="projectDescription${projectCount}" rows="4" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="projectStart${projectCount}">Start Date:</label>
+                        <input type="date" class="form-control" id="projectStart${projectCount}" name="projectStart${projectCount}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="projectEnd${projectCount}">End Date:</label>
+                        <input type="date" class="form-control" id="projectEnd${projectCount}" name="projectEnd${projectCount}" required>
+                    </div>
+                    <button type="button" class="btn btn-danger remove-project-btn">Remove</button>
+                `;
+                projectDetailsContainer.appendChild(newProject);
+                attachRemoveButtons();
+            });
+
+            addAchievementButton.addEventListener('click', () => {
+                const achievementsContainer = document.getElementById('achievements');
+                const achievementCount = achievementsContainer.getElementsByClassName('achievement-entry').length;
+                const newAchievement = document.createElement('div');
+                newAchievement.className = 'achievement-entry';
+                newAchievement.innerHTML = `
+                    <div class="form-group">
+                        <label for="achievementHeading${achievementCount}">Heading:</label>
+                        <input type="text" class="form-control" id="achievementHeading${achievementCount}" name="achievementHeading${achievementCount}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="achievementDescription${achievementCount}">Description:</label>
+                        <textarea id="achievementDescription${achievementCount}" class="form-control" name="achievementDescription${achievementCount}" rows="4" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="achievementStartDate${achievementCount}">Start Date:</label>
+                        <input type="date" class="form-control" id="achievementStartDate${achievementCount}" name="achievementStartDate${achievementCount}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="achievementEndDate${achievementCount}">End Date:</label>
+                        <input type="date" class="form-control" id="achievementEndDate${achievementCount}" name="achievementEndDate${achievementCount}" required>
+                    </div>
+                    <button type="button" class="btn btn-danger remove-achievement-btn">Remove</button>
+                `;
+                achievementsContainer.appendChild(newAchievement);
+                attachRemoveButtons();
+            });
+
+            addEducationButton.addEventListener('click', () => {
+                const educationContainer = document.getElementById('educationDetails');
+                const educationCount = educationContainer.getElementsByClassName('education-entry').length;
+                const newEducation = document.createElement('div');
+                newEducation.className = 'education-entry';
+                newEducation.innerHTML = `
+                    <div class="form-group">
+                        <label for="degree${educationCount}">Degree/Course:</label>
+                        <input type="text" class="form-control" id="degree${educationCount}" name="degree${educationCount}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="field${educationCount}">Field of Study:</label>
+                        <input type="text" class="form-control" id="field${educationCount}" name="field${educationCount}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="institute${educationCount}">Institute Name:</label>
+                        <input type="text" class="form-control" id="institute${educationCount}" name="institute${educationCount}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="marks${educationCount}">Marks/Percentage/GPA:</label>
+                        <input type="text" class="form-control" id="marks${educationCount}" name="marks${educationCount}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="startDate${educationCount}">Start Date:</label>
+                        <input type="date" class="form-control" id="startDate${educationCount}" name="startDate${educationCount}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="endDate${educationCount}">End Date:</label>
+                        <input type="date" class="form-control" id="endDate${educationCount}" name="endDate${educationCount}" required>
+                    </div>
+                    <button type="button" class="btn btn-danger remove-education-btn">Remove</button>
+                `;
+                educationContainer.appendChild(newEducation);
+                attachRemoveButtons();
+            });
+
+            addCertificationButton.addEventListener('click', () => {
+                const certificationContainer = document.getElementById('certificationDetails');
+                const certificationCount = certificationContainer.getElementsByClassName('certification-entry').length;
+                const newCertification = document.createElement('div');
+                newCertification.className = 'certification-entry';
+                newCertification.innerHTML = `
+                    <div class="form-group">
+                        <label for="certificationName${certificationCount}">Certification Title:</label>
+                        <input type="text" class="form-control" id="certificationName${certificationCount}" name="certificationName${certificationCount}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="issuingOrganization${certificationCount}">Issuing Organization:</label>
+                        <input type="text" class="form-control" id="issuingOrganization${certificationCount}" name="issuingOrganization${certificationCount}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="issueDate${certificationCount}">Date of Issue:</label>
+                        <input type="date" class="form-control" id="issueDate${certificationCount}" name="issueDate${certificationCount}" required>
+                    </div>
+                    <button type="button" class="btn btn-danger remove-certification-btn">Remove</button>
+                `;
+                certificationContainer.appendChild(newCertification);
+                attachRemoveButtons();
+            });
+
+            addLanguageButton.addEventListener('click', () => {
+                const languageContainer = document.getElementById('languageCompetencies');
+                const languageCount = languageContainer.getElementsByClassName('language-entry').length;
+                const newLanguage = document.createElement('div');
+                newLanguage.className = 'language-entry';
+                newLanguage.innerHTML = `
+                    <div class="form-group">
+                        <label for="language${languageCount}">Language:</label>
+                        <input type="text" class="form-control" id="language${languageCount}" name="language${languageCount}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="proficiency${languageCount}">Proficiency:</label>
+                        <input type="text" class="form-control" id="proficiency${languageCount}" name="proficiency${languageCount}" required>
+                    </div>
+                    <button type="button" class="btn btn-danger remove-language-btn">Remove</button>
+                `;
+                languageContainer.appendChild(newLanguage);
+                attachRemoveButtons();
+            });
+
+            function attachRemoveButtons() {
+            document.querySelectorAll('.remove-experience-btn').forEach(btn => {
+            btn.addEventListener('click', () => btn.parentElement.remove());
+            });
+            document.querySelectorAll('.remove-project-btn').forEach(btn => {
+            btn.addEventListener('click', () => btn.parentElement.remove());
+            });
+            document.querySelectorAll('.remove-achievement-btn').forEach(btn => {
+            btn.addEventListener('click', () => btn.parentElement.remove());
+            });
+            document.querySelectorAll('.remove-education-btn').forEach(btn => {
+                btn.addEventListener('click', () => btn.parentElement.remove());
+            });
+            document.querySelectorAll('.remove-certification-btn').forEach(btn => {
+                btn.addEventListener('click', () => btn.parentElement.remove());
+            });
+            document.querySelectorAll('.remove-language-btn').forEach(btn => {
+                btn.addEventListener('click', () => btn.parentElement.remove());
+            });
+        }
+
+attachRemoveButtons();
+
+            showSection(currentSectionIndex);
+            attachRemoveButtons();
+        });
+    </script>
+</body>
+</html>
