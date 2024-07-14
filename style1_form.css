@@ -1,0 +1,179 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+
+body {
+    background: linear-gradient(-45deg, #2b377c, #f2efe9, #cbb27f);
+    background-size: 400% 400%;
+    animation: gradient 10s ease infinite;
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+    height: 100vh;
+    margin: 0;
+    background-attachment: fixed;
+    text-align: left;
+    font-family: "Open Sans", sans-serif;
+}
+
+.upload-container {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 50px;
+    width: 100%;
+    max-width: 900px;
+    position: relative;
+}
+
+.upload-container h2 {
+    margin-bottom: 20px;
+}
+
+h1 {
+    text-align: center;
+    text-decoration: underline;
+}
+
+h2 {
+    border-style: none none solid none;
+}
+
+.btn {
+    background-color: #2b377c;
+    border: none;
+    color: white;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    margin: 10px 0; 
+}
+
+.next-btn {
+    right: 5%;
+}
+
+.prev-btn {
+    background-color: #5c6464;
+    left: 5%;
+}
+
+#sub {
+    background: #002d62;
+    border: none;
+    border-radius: 5px;
+    width: 12%;
+    color: white;
+    cursor: pointer;
+    padding: 10px 20px;
+    text-align: center;
+    transition: background 0.3s ease;
+}
+
+#sub:hover {
+    background: #3553ff;
+}
+
+#res {
+    width: 10%;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.form-section {
+    display: none;
+    transition: opacity 0.5s ease;
+}
+
+.form-section.active {
+    display: block;
+    opacity: 1;
+}
+
+.progress {
+    height: 20px;
+    margin-bottom: 20px;
+}
+
+.progress-bar {
+    width: 0%;
+    height: 100%;
+    background-color: #002d62;
+    transition: width 0.5s ease;
+}
+
+@keyframes gradient {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.btn-danger,
+.btn-success,
+.btn-primary {
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    color: white;
+    margin: 10px 0; 
+}
+
+.btn-danger {
+    background-color: #dc3545;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+}
+
+.btn-success {
+    background-color: #28a745;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+}
+
+.remove-experience-btn,
+.remove-project-btn,
+.remove-achievement-btn,
+.remove-education-btn,
+.remove-certification-btn,
+.remove-language-btn {
+    position: relative; 
+    margin-bottom: 10px; 
+}
+
+.add-experience-btn,
+.add-project-btn,
+.add-achievement-btn,
+.add-education-btn,
+.add-certification-btn,
+.add-language-btn {
+    position: relative; 
+    margin-bottom: 10px; 
+}
+
+.next-btn {
+    right: 5%;
+}
+
+.prev-btn {
+    left: 5%;
+}
+
+.btn-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.btn-group .btn {
+    flex: 1;
+    margin: 0 5px;
+}
