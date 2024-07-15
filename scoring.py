@@ -1,123 +1,74 @@
 import os
 import json
-import groq
 import torch
 from transformers import AutoTokenizer, AutoModel
 from sklearn.metrics.pairwise import cosine_similarity
+from langchain_core.output_parsers import JsonOutputParser
+from langchain_core.prompts import PromptTemplate
+from langchain_core.pydantic_v1 import BaseModel, Field
+from langchain_groq import ChatGroq
 from dotenv import load_dotenv
 
 load_dotenv()
 
-def jd_parser(jd_text):
-    client = groq.Groq(api_key=os.environ["CHATGROQ_API_KEY"])
+class Work_Details(BaseModel):
+    Company: str = Field(description="Company (Optional)")
+    Job_Role: str = Field(description="Job Role (Optional)")
+    Job_Description: str = Field(description="Description of the work experience")
 
-    chat_completion = client.chat.completions.create(
-    messages=[
-                {
-                    "role": "user",
-                    "content": f"seed=33"
-                    f"You are a professional job description parsing agent. "
-                    f"So do as follows: "
-                    f"1. Generate a Summary of the job description."
-                    f"2. Extract the Work Experience requirements with keys being: "
-                    f"a. Company name (Optional) "
-                    f"b. Job Role "
-                    f"c. Job Type (Full Time or Intern) "
-                    f"3. Extract the Project details requirements with keys being: "
-                    f"a. Name of Project with short introduction of it, if mentioned "
-                    f"b. Description of project. "
-                    f"4. Extract the Achievement details requirements with keys being: "
-                    f"a. Heading with short introduction of it, if mentioned "
-                    f"b. Description of the heading. "
-                    f"5. Extract the Education details requirements with keys being: "
-                    f"a. Degree/Course"
-                    f"b. Field of Study (note: usually written alongside degree, extract from 'degree' key if that is the case) "
-                    f"c. Institute"
-                    f"d. Marks/Percentage/GPA"
-                    f"6. Extract the Certification details requirements with keys being: "
-                    f"a. Certification Title "
-                    f"b. Issuing Organization "
-                    f"7. List all the skills from the following document. "
-                    f"8. List me all the language competencies from the following document. "
-                    f"You are to generate a valid JSON script as output. Properly deal with trailing commas while formatting the output file. Do not write any other note or introductory sentence, stick to generating only the valid json."
-                    f"Strictly don't write any additional notes whatsoever."
-                    f"When generating output strictly follow this format: "
-                    f"1st line: 'Here is the JSON output', No space and next line till last line: Entire JSON content"
-                    f"Take this empty json format and fill it up: "
-                    f'{{ '
-                    f'"Summary": "", '
-                    f'"Work_Experience": [ '
-                    f'{{ '
-                    f'"Company_Name": "", '
-                    f'"Job_Role": "", '
-                    f'"Job_Type": "", '
-                    f'}} '
-                    f'], '
-                    f'"Projects": [ '
-                    f'{{ '
-                    f'"Name_of_Project": "", '
-                    f'"Description": "", '
-                    f'}} '
-                    f'], '
-                    f'"Achievements": [ '
-                    f'{{ '
-                    f'"Heading": "", '
-                    f'"Description": "", '
-                    f'}} '
-                    f'], '
-                    f'"Education": [ '
-                    f'{{ '
-                    f'"Degree/Course": "", '
-                    f'"Field_of_Study": "", '
-                    f'"Institute": "", '
-                    f'"Marks/Percentage/GPA": "", '
-                    f'}} '
-                    f'], '
-                    f'"Certifications": [ '
-                    f'{{ '
-                    f'"Certification_Title": "", '
-                    f'"Issuing_Organization": "", '
-                    f'}} '
-                    f'], '
-                    f'"Skills": [], '
-                    f'"Language_Competencies": [ '
-                    f'{{ '
-                    f'"Language": "", '
-                    f'"Proficiency": "" '
-                    f'}} '
-                    f'] '
-                    f'}} '
-                    f"Job Description: {jd_text}",
-                }
-            ],
-            model="llama3-70b-8192",
+class Proj_Details(BaseModel):
+    Name_of_Project: str = Field(description="Name of the Project (Optional)")
+    Description: str = Field(description="Description of the Project")
+
+class Achievement_Details(BaseModel):
+    Heading: str = Field(description="Heading of the Achievement (Optional)")
+    Description: str = Field(description="Description of the Achievement (Optional)")
+    
+class Education_Details(BaseModel):
+    Degree_Name: str = Field(description="Name of the degree or the course required for the job (Optional)")
+    Field_of_Study: str = Field(description="Field of study required for the job (Optional)")
+    Institute: str = Field(description="Institute required for the job (Optional)")
+    Marks_Percentage_GPA: str = Field(description="Marks required for the job (Optional)")
+    
+class Certification_Details(BaseModel):
+    Certification_Title: str = Field(description="Title of the certification required for the job (Optional)")
+    Issuing_Organization: str = Field(description="Name of the issuing organization (Optional)")
+    
+class Job_Description_JSON(BaseModel):
+    Keywords: list[str] = Field(description="A comprehensive list of all the keywords present in the job description.")
+    Work_Experience: list[Work_Details] = Field(description="Required Work Experience for the job")
+    Projects: list[Proj_Details] = Field(description="Required projects for the job")
+    Achievements: list[Achievement_Details] = Field(description="Required achievements for the job")
+    Certifications: list[Certification_Details] = Field(description="Required certifications for the job")
+    Education: list[Education_Details] = Field(description="Required educational background for the job")
+    Skills: list[str] = Field(description="Skills required for the job")
+    Language_Competencies: list[str] = Field(description="Languages required for the job (Optional)")
+
+def jd_parser(jd_text):
+    client = ChatGroq(
+        temperature=0,
+        model='llama3-70b-8192',
+        api_key=os.environ["CHATGROQ_API_KEY"]
         )
 
-    text = chat_completion.choices[0].message.content
+    parser = JsonOutputParser(pydantic_object=Job_Description_JSON)
 
-    start_index = text.find('{')
-    text = text[start_index:]
-    last_brace_index = text.rfind('}')
-    if last_brace_index != -1:
-        text = text[:last_brace_index + 1]
+    prompt = PromptTemplate(
+            template="""
+                    You are a professional job description parsing agent.
+                    If the description is <Optional>, do not fill anything if you are not perfectly sure.
+                    {format_instructions}
+                    {resume}
+                """,
+            input_variables=["resume"],
+            partial_variables={"format_instructions": parser.get_format_instructions()}
+    )
 
-    text = text.replace('"Personal_Information": [],',
-                                '"Personal_Information": [{"Name": null,"Email": null,"Phone_Number": null,"Address": null,"LinkedIn_URL": null}],')
-    text = text.replace('"Work_Experience": [],',
-                            '"Work_Experience": [{"Company_Name": null,"Mode_of_Work": null,"Job_Role": null,"Start_Date": null,"End_Date": null}],')
-    text = text.replace('"Projects": [],',
-                            '"Projects": [{"Name_of_Project": null,"Description": null,"Start_Date": null,"End_Date": null}],')
-    text = text.replace('"Achievements": [],',
-                            '"Achievements": [{"Heading": null,"Description": null,"Start_Date": null,"End_Date": null}],')
-    text = text.replace('"Education": [],',
-                            '"Education": [{"Degree/Course": null,"Field_of_Study": null,"Institute": null,"Marks/Percentage/GPA": null,"Start_Date": null,"End_Date": null}],')
-    text = text.replace('"Certifications": [],',
-                            '"Certifications": [{"Certification_Title": null,"Issuing_Organization": null,"Date_Of_Issue": null}],')
-    text = text.replace('"Language_Competencies": []',
-                            '"Language_Competencies": [{"Language": null,"Proficiency": null}]')
+    chain = prompt | client | parser
+    text = chain.invoke({"resume": jd_text})
     # print(text)
-    response_json = json.loads(text, strict=True)
-    return response_json
+    response_dict = json.dumps(text, indent=4)
+    return json.loads(response_dict)
 
 class Scoring:
 
@@ -127,8 +78,8 @@ class Scoring:
         self.resume = resume
 
         response = jd_parser(self.job_description)
-        print(response)
         self.response = self.remove_nulls(response)
+        print("After removing nulls")
 
     # Function to remove null values from the output
     def remove_nulls(self, value):
@@ -141,6 +92,7 @@ class Scoring:
         
     # Function to calculate the final similarity score
     def final_similarity(self):
+        print("Before Model")
         model_name = 'intfloat/e5-small-v2'
         tokenizer = AutoTokenizer.from_pretrained(model_name)
         model = AutoModel.from_pretrained(model_name)
@@ -148,8 +100,10 @@ class Scoring:
         similarity_arr = dict()
         alpha = 0.8
 
+        print("Before for loop")
+
         for field in self.response.keys():
-            if field in self.resume.keys() and len(self.response[field]) != 0:
+            if len(self.response[field]) != 0 and any([i.isalnum() for i in self.resume[field]]):
                 response_field = str(self.response[field])
                 resume_field = str(self.resume[field])
 
@@ -161,8 +115,8 @@ class Scoring:
                 
                 similarity_arr[field] = (alpha * cosine + (1 - alpha) * euclidean).item()
 
-            elif field in self.resume.keys():
-                response_field = str(self.response['Summary'])
+            elif any([i.isalnum() for i in str(self.resume[field])]):
+                response_field = str(self.response['Keywords'])
                 resume_field = str(self.resume[field])
 
                 response_embedding = self.get_embeddings(response_field, tokenizer, model)
@@ -176,6 +130,7 @@ class Scoring:
             else:
                 similarity_arr[field] = 0
                 
+        print("Before final score")
         final_score = 0
         for i in similarity_arr.values():
             final_score += (100/8) * i

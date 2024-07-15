@@ -1,6 +1,7 @@
 import math
 import os
 import re
+from typing import List
 from dotenv import load_dotenv
 import random
 import flask
@@ -8,23 +9,21 @@ from flask import Flask, jsonify, render_template, request, redirect, url_for
 import fitz
 import groq
 from docx import Document
-from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.prompts import PromptTemplate
+from langchain_core.output_parsers import JsonOutputParser
 from langchain_groq import ChatGroq
 from docx import Document
 import pandas as pd
 from flask_sqlalchemy import SQLAlchemy
+from pydantic import BaseModel, Field
 from sqlalchemy.sql import text
 from datetime import datetime
-import dspy
 import json
 from scoring import Scoring
 import dash
 from dash import dcc, html
 import dash_bootstrap_components as dbc
 import plotly.express as px
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
 
 load_dotenv()
 app = Flask(__name__)
@@ -92,7 +91,7 @@ education_fig.update_layout(
     plot_bgcolor=colors['secondary'],
     paper_bgcolor=colors['background']
 )
-
+skills_df = skills_df.nlargest(15, 'frequency')
 skills_fig = px.bar(
     skills_df,
     x='frequency',
@@ -270,7 +269,7 @@ def exact_match():
     # Checking for exact match
     matching_id = set()
     for req in list(gen_sum):
-        for words in info['txtbox'].split():
+        for words in info['txtbox'].split(','):
             for match in req[1].split():
                 if re.search(r'\b' + words + r'\b', match):
                     matching_id.add(req[0])
@@ -311,6 +310,64 @@ def exact_match():
 def login():
     return render_template('login.html')
 
+# Pydantic Object Format
+class PersonalInformation(BaseModel):
+    Name: str = Field(description="Name of the person")
+    Email: str = Field(description="Email address of the person")
+    Phone_Number: str = Field(description="Phone number of the person")
+    Address: str = Field(description="Address of the person")
+    LinkedIn_URL: str = Field(description="LinkedIn profile URL of the person")
+
+class WorkExperience(BaseModel):
+    Company_Name: str = Field(description="Name of the company")
+    Mode_of_Work: str = Field(description="Mode of work (e.g., remote, on-site)")
+    Job_Role: str = Field(description="Job role/title")
+    Job_Type: str = Field(description="Type of job (e.g., full-time, part-time)")
+    Start_Date: str = Field(description="Start date of the job")
+    End_Date: str = Field(description="End date of the job")
+
+class Project(BaseModel):
+    Name_of_Project: str = Field(description="Name of the project")
+    Description: str = Field(description="Description of the project")
+    Start_Date: str = Field(description="Start date of the project")
+    End_Date: str = Field(description="End date of the project")
+
+class Achievement(BaseModel):
+    Heading: str = Field(description="Heading of the achievement")
+    Description: str = Field(description="Description of the achievement")
+    Start_Date: str = Field(description="Start date of the achievement")
+    End_Date: str = Field(description="End date of the achievement")
+    
+# Needs work
+class EducationDetails(BaseModel):
+    Degree_Name: str = Field(description="Name of the degree persued by the candidate (Like BSc, B.Tech, MSc BCA, Phd, etc.)")
+    Field_of_Study: str = Field(description="Field of study")
+    University: str = Field(description="Name of the University or Institute")
+    Marks_Percentage_GPA: str = Field(description="Marks/Percentage/GPA")
+    Start_Date: str = Field(description="Start date of the education")
+    End_Date: str = Field(description="End date of the education")
+    
+class Certification(BaseModel):
+    Certification_Title: str = Field(description="Title of the certification")
+    Issuing_Organization: str = Field(description="Name of the issuing organization")
+    Date_Of_Issue: str = Field(description="Date of issue of the certification")
+    
+class LanguageCompetency(BaseModel):
+    Language: str = Field(description="Language")
+    Proficiency: str = Field(description="Proficiency level")
+
+class ResumeJSON(BaseModel):
+    Personal_Information: PersonalInformation = Field(description="Personal information of the person")
+    Summary: str = Field(description="Summary or objective of the person")
+    Work_Experience: List[WorkExperience] = Field(description="Work experience details")
+    Projects: List[Project] = Field(description="Project details")
+    Achievements: List[Achievement] = Field(description="Achievement details")
+    Education: List[EducationDetails] = Field(description="Educational background")
+    Certifications: List[Certification] = Field(description="Certification details")
+    Skills: List[str] = Field(description="Skills of the person")
+    Extracurricular_Activities: List[str] = Field(description="Extracurricular activities of the person")
+    Language_Competencies: List[LanguageCompetency] = Field(description="Language competencies")
+
 @app.route('/upload', methods=['POST'])
 def upload_file():
     if 'file' not in request.files:
@@ -325,152 +382,52 @@ def upload_file():
         file.save(file_path)
         document_text = read_document(file_path)
 
-        client = groq.Groq(api_key=os.environ["CHATGROQ_API_KEY"])
-
-        chat_completion = client.chat.completions.create(
-            messages=[
-                {
-                    "role": "user",
-                    "content": f"seed=33"
-                            f"You are a professional resume parsing agent. "
-                            f"So do as follows: "
-                            f"1. Extract Personal Information of the applicant with keys being: "
-                            f"a. Extract name of the applicant. "
-                            f"b. Extract email of the applicant. "
-                            f"c. Extract phone number of the applicant. "
-                            f"d. Extract address of the applicant. "
-                            f"e. Extract linkedin url of the applicant (Add https:// in front of the link if it is not already present). "
-                            f"2. Extract me the Summary of the applicant if mentioned. "
-                            f"3. Extract me Work Experience details with keys being: "
-                            f"a. Company name "
-                            f"b. Mode of work (Offline/Online/Hybrid) "
-                            f"c. Job Role "
-                            f"d. Job Type (Full Time or Intern) "
-                            f"e. Start Date "
-                            f"f. End Date. "
-                            f"4. Extract me Project details with keys being: "
-                            f"a. Name of Project with short introduction of it, if mentioned "
-                            f"b. Description of project. "
-                            f"c. Start Date if any. "
-                            f"d. End Date if any "
-                            f"5. Extract me Achievement details with keys being: "
-                            f"a. Heading with short introduction of it, if mentioned "
-                            f"b. Description of the heading. "
-                            f"c. Start Date if any. "
-                            f"d. End Date if any: "
-                            f"6. Extract me Education details with keys being: "
-                            f"a. Degree/Course "
-                            f"b. Field of Study (note: usually written alongside degree, extract from 'degree' key if that is the case) "
-                            f"c. Institute "
-                            f"d. Marks/Percentage/GPA "
-                            f"e. Start Date if any "
-                            f"f. End Date/ Passing Year "
-                            f"7. Extract me Certification details with keys being: "
-                            f"a. Certification Title "
-                            f"b. Issuing Organization "
-                            f"c. Date Of Issue "
-                            f"8. List me all the skills from the following document. "
-                            f"9. List me all the extracurricular activities/hobbies from the following document. "
-                            f"10. List me all the language competencies from the following document. "
-                            f"You are to generate a valid JSON script as output. Properly deal with trailing commas while formatting the output file. Do not write any other note or introductory sentence, stick to generating only the valid json."
-                            f"Strictly don't write any additional notes whatsover."
-                            f"When generating output strictly follow this format: "
-                            f"1st line: 'Here is the JSON output', No space and next line till last line: Entire JSON content"
-                            f"Take this empty json format and fill it up: "
-                            f'{{ '
-                            f'"Personal_Information": {{ '
-                            f'"Name": "", '
-                            f'"Email": "", '
-                            f'"Phone_Number": "", '
-                            f'"Address": "", '
-                            f'"LinkedIn_URL": "" '
-                            f'}}, '
-                            f'"Summary": "", '
-                            f'"Work_Experience": [ '
-                            f'{{ '
-                            f'"Company_Name": "", '
-                            f'"Mode_of_Work": "", '
-                            f'"Job_Role": "", '
-                            f'"Job_Type": "", '
-                            f'"Start_Date": "", '
-                            f'"End_Date": "" '
-                            f'}} '
-                            f'], '
-                            f'"Projects": [ '
-                            f'{{ '
-                            f'"Name_of_Project": "", '
-                            f'"Description": "", '
-                            f'"Start_Date": "", '
-                            f'"End_Date": "" '
-                            f'}} '
-                            f'], '
-                            f'"Achievements": [ '
-                            f'{{ '
-                            f'"Heading": "", '
-                            f'"Description": "", '
-                            f'"Start_Date": "", '
-                            f'"End_Date": "" '
-                            f'}} '
-                            f'], '
-                            f'"Education": [ '
-                            f'{{ '
-                            f'"Degree/Course": "", '
-                            f'"Field_of_Study": "", '
-                            f'"Institute": "", '
-                            f'"Marks/Percentage/GPA": "", '
-                            f'"Start_Date": "", '
-                            f'"End_Date": "" '
-                            f'}} '
-                            f'], '
-                            f'"Certifications": [ '
-                            f'{{ '
-                            f'"Certification_Title": "", '
-                            f'"Issuing_Organization": "", '
-                            f'"Date_Of_Issue": "" '
-                            f'}} '
-                            f'], '
-                            f'"Skills": [], '
-                            f'"Extracurricular_Activities": [], '
-                            f'"Language_Competencies": [ '
-                            f'{{ '
-                            f'"Language": "", '
-                            f'"Proficiency": "" '
-                            f'}} '
-                            f'] '
-                            f'}} '
-                            f"Resume of applicant: {document_text}, if no texts are written after 'Resume of applicant:', return me the empty json template back.",
-                }
-            ],
-            model="llama3-70b-8192",
+        client = ChatGroq(
+            temperature=0,
+            model='llama3-70b-8192',
+            api_key="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"
         )
+        
+        parser = JsonOutputParser(pydantic_object=ResumeJSON)
 
-        text = chat_completion.choices[0].message.content
+        prompt = PromptTemplate(
+                        template="""
+                                You are a professional resume parsing agent.
+                                You can leave a key empty if you are not sure about the value.
+                                {format_instructions}
+                                {resume}
+                            """,
+                        input_variables=["resume"],
+                        partial_variables={"format_instructions": parser.get_format_instructions()}
+                )
 
-        start_index = text.find('{')
-        text = text[start_index:]
-        last_brace_index = text.rfind('}')
-        if last_brace_index != -1:
-            text = text[:last_brace_index + 1]
+        chain = prompt | client | parser
+        text = chain.invoke({"resume": document_text})
+        
+        if text['Personal_Information'] == []:
+            text['Personal_Information'] = [{"Name": '',"Email": '',"Phone_Number": '',"Address": '',"LinkedIn_URL": ''}]
+        
+        if text['Work_Experience'] == []:
+            text['Work_Experience'] = [{"Company_Name": '',"Mode_of_Work": '',"Job_Role": '',"Start_Date": '',"End_Date": ''}]
 
-        text = text.replace('"Personal_Information": [],',
-                                '"Personal_Information": [{"Name": null,"Email": null,"Phone_Number": null,"Address": null,"LinkedIn_URL": null}],')
-        text = text.replace('"Work_Experience": [],',
-                            '"Work_Experience": [{"Company_Name": null,"Mode_of_Work": null,"Job_Role": null,"Start_Date": null,"End_Date": null}],')
-        text = text.replace('"Projects": [],',
-                            '"Projects": [{"Name_of_Project": null,"Description": null,"Start_Date": null,"End_Date": null}],')
-        text = text.replace('"Achievements": [],',
-                            '"Achievements": [{"Heading": null,"Description": null,"Start_Date": null,"End_Date": null}],')
-        text = text.replace('"Education": [],',
-                            '"Education": [{"Degree/Course": null,"Field_of_Study": null,"Institute": null,"Marks/Percentage/GPA": null,"Start_Date": null,"End_Date": null}],')
-        text = text.replace('"Certifications": [],',
-                            '"Certifications": [{"Certification_Title": null,"Issuing_Organization": null,"Date_Of_Issue": null}],')
-        text = text.replace('"Language_Competencies": []',
-                            '"Language_Competencies": [{"Language": null,"Proficiency": null}]')
-        # print(text)
-        response_json = json.loads(text, strict=False)
+        if text['Projects'] == []:
+            text['Projects'] = [{"Name_of_Project": '',"Description": '',"Start_Date": '',"End_Date": ''}]
+
+        if text['Achievements'] == []:
+            text['Achievements'] = [{"Heading": '',"Description": '',"Start_Date": '',"End_Date": ''}]
+
+        if text['Education'] == []:
+            text['Education'] = [{"Degree_Name": '',"Field_of_Study": '',"Institute": '',"Marks/Percentage/GPA": '',"Start_Date": '',"End_Date": ''}]
+            
+        if text['Certifications'] == []:
+            text['Certifications'] = [{"Certification_Title": '',"Issuing_Organization": '',"Date_Of_Issue": ''}]
+
+        if text['Language_Competencies'] == []:
+            text['Language_Competencies'] = [{"Language": '',"Proficiency": ''}]
+        # print(text['Education'])
         output_filename = app.config['GENERATED_JSON']
         with open(output_filename, 'w') as json_file:
-            json.dump(response_json, json_file, indent=4)
+            json.dump(text, json_file, indent=4)
         return redirect(url_for('resume_form'))
 
 
@@ -534,23 +491,22 @@ def feedback():
 # <======================================================================================================================>
 
 def summ(rj):
-    chat = ChatGroq(
-        temperature=0,
-        model="llama3-70b-8192",
-        api_key=os.environ["CHATGROQ_API_KEY"]
-    )
-    system = '''You are an expert to fetch all the keywords from a given resume.
+    prompt = f'''You are an expert to fetch all the keywords from a given resume.
                 You will be given a resume in json format.
                 Read the entire resume and figure out all the keywords.
                 Be careful that your list MUST include ALL the keywords mentioned in the resume.
                 Start with 1.
+                {rj}
              '''
-    human = "{resume}"
-    this = {"resume":rj}
-    prompt = ChatPromptTemplate.from_messages([("system", system), ("human", human)])
-    chain = prompt | chat
-    kws = chain.invoke(this).content
-    return ' '.join([match.strip() for match in re.findall(r'\d+\.(.*)', kws)])
+    
+    client = groq.Groq(api_key=os.environ["CHATGROQ_API_KEY"])
+    response = client.chat.completions.create(
+                messages=[{"role": "user", "content": prompt}],
+                model="llama3-70b-8192",
+                seed=42
+            )
+    kws = response.choices[0].message.content
+    return ','.join([match.strip() for match in re.findall(r'\d+\.(.*)', kws)])
 
 class PersonalInformation(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -650,7 +606,6 @@ class Score(db.Model):
 
 # db.drop_all()  # if any changes made to the above database classes.
 db.create_all()
-
 
 @app.route('/submit', methods=['POST'])
 def submit():
@@ -838,14 +793,14 @@ def submit():
         db.session.add(language_competency)
 
     # Scoring
-    resume_info = {'Summary':gen_sum,
-                   'Work Experience':scoring_we,
+    resume_info = {'Keywords':gen_sum,
+                   'Work_Experience':scoring_we,
                    'Projects':scoring_prj,
                    'Achievements':scoring_ach,
-                   'Education Details':scoring_ed,
+                   'Education':scoring_ed,
                    'Certifications':scoring_cert,
                    'Skills':skills,
-                   'Languages':language}
+                   'Language_Competencies':language}
 
     jd_text = open(r"S:\resume_parsing\job_descriptions\Prof.-CS-Sitare-University.txt", encoding='utf-8').read()
 

@@ -30,7 +30,6 @@ body {
 
 h1 {
     text-align: center;
-    text-decoration: underline;
 }
 
 h2 {
@@ -56,11 +55,30 @@ h2 {
     left: 5%;
 }
 
+.btn-success {
+    background-color: #002d62;
+    position: absolute;
+    left: 45%;
+}
+
+.btn-danger {
+    background-color: #5c6464;
+    position: absolute;
+    left: 47.5%;
+}
+
 .position-right {
     position: absolute;
     right: 5%;
 }
 
+.btn-danger:hover {
+    background-color: #c82333;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+}
 
 #sub {
     background: #002d62;
@@ -106,6 +124,16 @@ h2 {
     height: 100%;
     background-color: #002d62;
     transition: width 0.5s ease;
+}
+
+.remove-experience-btn,
+.remove-project-btn,
+.remove-achievement-btn,
+.remove-education-btn,
+.remove-certification-btn,
+.remove-language-btn {
+    position: relative; 
+    margin-bottom: 10px; 
 }
 
 @keyframes gradient {
