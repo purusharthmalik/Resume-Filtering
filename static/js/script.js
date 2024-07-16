@@ -86,7 +86,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function validateSection(section) {
-        const inputs = section.querySelectorAll("input, textarea");
+        const inputs = section.querySelectorAll(".required input");
         for (const input of inputs) {
             if (!input.checkValidity()) {
                 input.reportValidity();

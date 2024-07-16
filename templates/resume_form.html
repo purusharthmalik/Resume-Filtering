@@ -13,28 +13,28 @@
         <div class="progress">
             <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
         </div>
-        <form action="/submit" method="post" class="needs-validation" novalidate>
+        <form action="/submit" method="post" class="needs-validation">
             <div class="form-section">
                 <h2 class="border-bottom pb-2">Personal Information</h2>
-                <div class="form-group">
+                <div class="form-group required">
                     <label for="name">Name:</label>
-                    <input type="text" class="form-control" id="name" name="name" value="{{ data['Personal_Information']['Name'] | title}}" required>
+                    <input type="text" class="form-control" id="name" name="name" value="{{ data['Personal_Information']['Name'] | title}}">
                 </div>
-                <div class="form-group">
+                <div class="form-group  required">
                     <label for="email">Email:</label>
-                    <input type="email" class="form-control" id="email" name="email" value="{{ data['Personal_Information']['Email'] }}" required>
+                    <input type="email" class="form-control" id="email" name="email" value="{{ data['Personal_Information']['Email'] }}">
                 </div>
-                <div class="form-group">
+                <div class="form-group required">
                     <label for="phone">Phone Number:</label>
-                    <input type="text" class="form-control" id="phone" name="phone" value="{{ data['Personal_Information']['Phone_Number'] }}" required>
+                    <input type="text" class="form-control" id="phone" name="phone" value="{{ data['Personal_Information']['Phone_Number'] }}">
                 </div>
                 <div class="form-group">
                     <label for="address">Address:</label>
-                    <input type="text" class="form-control" id="address" name="address" value="{{ data['Personal_Information']['Address'] }}" required>
+                    <input type="text" class="form-control" id="address" name="address" value="{{ data['Personal_Information']['Address'] }}">
                 </div>
                 <div class="form-group">
                     <label for="linkedin">LinkedIn URL:</label>
-                    <input type="url" class="form-control" id="linkedin" name="linkedin" value="{{ data['Personal_Information']['LinkedIn_URL'] }}" required>
+                    <input type="url" class="form-control" id="linkedin" name="linkedin" value="{{ data['Personal_Information']['LinkedIn_URL'] }}">
                 </div>
                 <button type="button" class="btn btn-primary next-btn position-right">Next</button>
             </div>
@@ -55,27 +55,27 @@
                     <div class="education-entry">
                         <div class="form-group">
                             <label for="degree{{ loop.index0 }}">Degree/Course:</label>
-                            <input type="text" class="form-control" id="degree{{ loop.index0 }}" name="degree{{ loop.index0 }}" value="{{ education['Degree_Name'] }}" required>
+                            <input type="text" class="form-control" id="degree{{ loop.index0 }}" name="degree{{ loop.index0 }}" value="{{ education['Degree_Name'] }}">
                         </div>
                         <div class="form-group">
                             <label for="field{{ loop.index0 }}">Field of Study:</label>
-                            <input type="text" class="form-control" id="field{{ loop.index0 }}" name="field{{ loop.index0 }}" value="{{ education['Field_of_Study'] }}" required>
+                            <input type="text" class="form-control" id="field{{ loop.index0 }}" name="field{{ loop.index0 }}" value="{{ education['Field_of_Study'] }}">
                         </div>
                         <div class="form-group">
                             <label for="institute{{ loop.index0 }}">Institute:</label>
-                            <input type="text" class="form-control" id="institute{{ loop.index0 }}" name="institute{{ loop.index0 }}" value="{{ education['University'] }}" required>
+                            <input type="text" class="form-control" id="institute{{ loop.index0 }}" name="institute{{ loop.index0 }}" value="{{ education['University'] }}">
                         </div>
                         <div class="form-group">
                             <label for="marks{{ loop.index0 }}">Marks/Percentage/GPA:</label>
-                            <input type="text" class="form-control" id="marks{{ loop.index0 }}" name="marks{{ loop.index0 }}" value="{{ education['Marks_Percentage_GPA'] }}" required>
+                            <input type="text" class="form-control" id="marks{{ loop.index0 }}" name="marks{{ loop.index0 }}" value="{{ education['Marks_Percentage_GPA'] }}">
                         </div>
-                        <div class="form-group">
+                        <div class="form-group required">
                             <label for="startDate{{ loop.index0 }}">Start Date:</label>
-                            <input type="date" class="form-control" id="startDate{{ loop.index0 }}" name="startDate{{ loop.index0 }}" value="{{ education['Start_Date'] }}" required>
+                            <input type="date" class="form-control" id="startDate{{ loop.index0 }}" name="startDate{{ loop.index0 }}" value="{{ education['Start_Date'] }}">
                         </div>
-                        <div class="form-group">
+                        <div class="form-group required">
                             <label for="endDate{{ loop.index0 }}">End Date/Passing Year:</label>
-                            <input type="date" class="form-control" id="endDate{{ loop.index0 }}" name="endDate{{ loop.index0 }}" value="{{ education['End_Date'] }}" required>
+                            <input type="date" class="form-control" id="endDate{{ loop.index0 }}" name="endDate{{ loop.index0 }}" value="{{ education['End_Date'] }}">
                         </div>
                         <button type="button" class="btn btn-danger remove-project-btn">Remove</button>
                     </div>
@@ -93,31 +93,31 @@
                     <div class="experience-entry">
                         <div class="form-group">
                             <label for="companyName{{ loop.index }}">Company Name:</label>
-                            <input type="text" class="form-control" id="companyName{{ loop.index }}" name="companyName{{ loop.index }}" value="{{ experience['Company_Name'] }}" required>
+                            <input type="text" class="form-control" id="companyName{{ loop.index }}" name="companyName{{ loop.index }}" value="{{ experience['Company_Name'] }}">
                         </div>
                         <div class="form-group">
                             <label for="modeOfWork{{ loop.index }}">Mode of Work:</label>
-                            <input type="text" class="form-control" id="modeOfWork{{ loop.index }}" name="modeOfWork{{ loop.index }}" value="{{ experience['Mode_of_Work'] }}" required>
+                            <input type="text" class="form-control" id="modeOfWork{{ loop.index }}" name="modeOfWork{{ loop.index }}" value="{{ experience['Mode_of_Work'] }}">
                         </div>
                         <div class="form-group">
                             <label for="jobRole{{ loop.index }}">Job Role:</label>
-                            <input type="text" class="form-control" id="jobRole{{ loop.index }}" name="jobRole{{ loop.index }}" value="{{ experience['Job_Role'] }}" required>
+                            <input type="text" class="form-control" id="jobRole{{ loop.index }}" name="jobRole{{ loop.index }}" value="{{ experience['Job_Role'] }}">
                         </div>
                         <div class="form-group">
                             <label for="jobType{{ loop.index }}">Job Type:</label>
-                            <input type="text" class="form-control" id="jobType{{ loop.index }}" name="jobType{{ loop.index }}" value="{{ experience['Job_Type'] }}" required>
+                            <input type="text" class="form-control" id="jobType{{ loop.index }}" name="jobType{{ loop.index }}" value="{{ experience['Job_Type'] }}">
                         </div>
                         <div class="form-group">
-                            <label for="endDate{{ loop.index }}">Description:</label>
-                            <textarea class="form-control" id="jobDescription{{ loop.index }}" name="jobDescription{{ loop.index }}" rows="4" required>{{ experience['Description'] }}</textarea>
+                            <label for="jobDescription{{ loop.index }}">Description:</label>
+                            <textarea class="form-control" id="jobDescription{{ loop.index }}" name="jobDescription{{ loop.index }}" rows="4">{{ experience['Description'] }}</textarea>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group required">
                             <label for="startDate{{ loop.index }}">Start Date:</label>
-                            <input type="date" class="form-control" id="startDate{{ loop.index }}" name="startDate{{ loop.index }}" value="{{ experience['Start_Date'] }}" required>
+                            <input type="date" class="form-control" id="startDate{{ loop.index }}" name="startDate{{ loop.index }}" value="{{ experience['Start_Date'] }}">
                         </div>
-                        <div class="form-group">
+                        <div class="form-group required">
                             <label for="endDate{{ loop.index }}">End Date:</label>
-                            <input type="date" class="form-control" id="endDate{{ loop.index }}" name="endDate{{ loop.index }}" value="{{ experience['End_Date'] }}" required>
+                            <input type="date" class="form-control" id="endDate{{ loop.index }}" name="endDate{{ loop.index }}" value="{{ experience['End_Date'] }}">
                         </div>
                         <button type="button" class="btn btn-danger remove-project-btn">Remove</button>
                     </div>
@@ -135,19 +135,19 @@
                     <div class="project-entry">
                         <div class="form-group">
                             <label for="projectName{{ loop.index0 }}">Project Name:</label>
-                            <input type="text" class="form-control" id="projectName{{ loop.index0 }}" name="projectName{{ loop.index0 }}" value="{{ project['Name_of_Project'] }}" required>
+                            <input type="text" class="form-control" id="projectName{{ loop.index0 }}" name="projectName{{ loop.index0 }}" value="{{ project['Name_of_Project'] }}">
                         </div>
                         <div class="form-group">
                             <label for="projectDescription{{ loop.index0 }}">Description:</label>
-                            <textarea id="projectDescription{{ loop.index0 }}" class="form-control" name="projectDescription{{ loop.index0 }}" rows="4" required>{{ project['Description'] }}</textarea>
+                            <textarea id="projectDescription{{ loop.index0 }}" class="form-control" name="projectDescription{{ loop.index0 }}" rows="4">{{ project['Description'] }}</textarea>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group required">
                             <label for="projectStart{{ loop.index0 }}">Start Date:</label>
-                            <input type="date" class="form-control" id="projectStart{{ loop.index0 }}" name="projectStart{{ loop.index0 }}" value="{{ project['Start_Date'] }}" required>
+                            <input type="date" class="form-control" id="projectStart{{ loop.index0 }}" name="projectStart{{ loop.index0 }}" value="{{ project['Start_Date'] }}">
                         </div>
-                        <div class="form-group">
+                        <div class="form-group required">
                             <label for="projectEnd{{ loop.index0 }}">End Date:</label>
-                            <input type="date" class="form-control" id="projectEnd{{ loop.index0 }}" name="projectEnd{{ loop.index0 }}" value="{{ project['End_Date'] }}" required>
+                            <input type="date" class="form-control" id="projectEnd{{ loop.index0 }}" name="projectEnd{{ loop.index0 }}" value="{{ project['End_Date'] }}">
                         </div>
                         <button type="button" class="btn btn-danger remove-project-btn">Remove</button>
                     </div>
@@ -165,19 +165,19 @@
                     <div class="achievement-entry">
                         <div class="form-group">
                             <label for="achievementHeading{{ loop.index }}">Heading:</label>
-                            <input type="text" class="form-control" id="achievementHeading{{ loop.index }}" name="achievementHeading{{ loop.index }}" value="{{ achievement['Heading'] }}" required>
+                            <input type="text" class="form-control" id="achievementHeading{{ loop.index }}" name="achievementHeading{{ loop.index }}" value="{{ achievement['Heading'] }}">
                         </div>
                         <div class="form-group">
                             <label for="achievementDescription{{ loop.index }}">Description:</label>
-                            <textarea id="achievementDescription{{ loop.index }}" class="form-control" name="achievementDescription{{ loop.index }}" rows="4" required>{{ achievement['Description'] }}</textarea>
+                            <textarea id="achievementDescription{{ loop.index }}" class="form-control" name="achievementDescription{{ loop.index }}" rows="4">{{ achievement['Description'] }}</textarea>
                         </div>
                         <div class="form-group">
                             <label for="achievementStartDate{{ loop.index }}">Start Date:</label>
-                            <input type="date" class="form-control" id="achievementStartDate{{ loop.index }}" name="achievementStartDate{{ loop.index }}" value="{{ achievement['Start_Date'] }}" required>
+                            <input type="date" class="form-control" id="achievementStartDate{{ loop.index }}" name="achievementStartDate{{ loop.index }}" value="{{ achievement['Start_Date'] }}">
                         </div>
                         <div class="form-group">
                             <label for="achievementEndDate{{ loop.index }}">End Date:</label>
-                            <input type="date" class="form-control" id="achievementEndDate{{ loop.index }}" name="achievementEndDate{{ loop.index }}" value="{{ achievement['End_Date'] }}" required>
+                            <input type="date" class="form-control" id="achievementEndDate{{ loop.index }}" name="achievementEndDate{{ loop.index }}" value="{{ achievement['End_Date'] }}">
                         </div>
                         <button type="button" class="btn btn-danger remove-project-btn">Remove</button>
                     </div>
@@ -195,15 +195,15 @@
                     <div class="certification-entry">
                         <div class="form-group">
                             <label for="certificationTitle{{ loop.index0 }}">Certification Title:</label>
-                            <input type="text" class="form-control" id="certificationTitle{{ loop.index0 }}" name="certificationTitle{{ loop.index0 }}" value="{{ certification['Certification_Title'] }}" required>
+                            <input type="text" class="form-control" id="certificationTitle{{ loop.index0 }}" name="certificationTitle{{ loop.index0 }}" value="{{ certification['Certification_Title'] }}">
                         </div>
                         <div class="form-group">
                             <label for="issuingOrganization{{ loop.index0 }}">Issuing Organization:</label>
-                            <input type="text" class="form-control" id="issuingOrganization{{ loop.index0 }}" name="issuingOrganization{{ loop.index0 }}" value="{{ certification['Issuing_Organization'] }}" required>
+                            <input type="text" class="form-control" id="issuingOrganization{{ loop.index0 }}" name="issuingOrganization{{ loop.index0 }}" value="{{ certification['Issuing_Organization'] }}">
                         </div>
                         <div class="form-group">
                             <label for="issueDate{{ loop.index0 }}">Date of Issue:</label>
-                            <input type="date" class="form-control" id="issueDate{{ loop.index0 }}" name="issueDate{{ loop.index0 }}" value="{{ certification['Date_Of_Issue'] }}" required>
+                            <input type="date" class="form-control" id="issueDate{{ loop.index0 }}" name="issueDate{{ loop.index0 }}" value="{{ certification['Date_Of_Issue'] }}">
                         </div>
                         <button type="button" class="btn btn-danger remove-project-btn">Remove</button>
                     </div>    
@@ -217,7 +217,7 @@
             <div class="form-section">
                 <h2 class="border-bottom pb-2">Skills</h2>
                 <div class="form-group">
-                    <textarea id="skills" class="form-control" name="skills" rows="4" required>{{ data['Skills'] | join(", ") }}</textarea>
+                    <textarea id="skills" class="form-control" name="skills" rows="4">{{ data['Skills'] | join(", ") }}</textarea>
                 </div>
                 <button type="button" class="btn btn-secondary prev-btn">Previous</button>
                 <button type="button" class="btn btn-primary next-btn position-right">Next</button>
@@ -226,7 +226,7 @@
             <div class="form-section">
                 <h2 class="border-bottom pb-2">Extracurricular Activities/Hobbies</h2>
                 <div class="form-group">
-                    <textarea id="activities" class="form-control" name="activities" rows="4" required>{{ data['Extracurricular_Activities'] | join(", ") }}</textarea>
+                    <textarea id="activities" class="form-control" name="activities" rows="4">{{ data['Extracurricular_Activities'] | join(", ") }}</textarea>
                 </div>
                 <button type="button" class="btn btn-secondary prev-btn">Previous</button>
                 <button type="button" class="btn btn-primary next-btn position-right">Next</button>
@@ -239,11 +239,11 @@
                     <div class="language-entry">
                         <div class="form-group">
                             <label for="language{{ loop.index0 }}">Language:</label>
-                            <input type="text" class="form-control" id="language{{ loop.index0 }}" name="language{{ loop.index0 }}" value="{{ language['Language'] }}" required>
+                            <input type="text" class="form-control" id="language{{ loop.index0 }}" name="language{{ loop.index0 }}" value="{{ language['Language'] }}">
                         </div>
                         <div class="form-group">
                             <label for="proficiency{{ loop.index0 }}">Proficiency Level:</label>
-                            <input type="text" class="form-control" id="proficiency{{ loop.index0 }}" name="proficiency{{ loop.index0 }}" value="{{ language['Proficiency'] }}" required>
+                            <input type="text" class="form-control" id="proficiency{{ loop.index0 }}" name="proficiency{{ loop.index0 }}" value="{{ language['Proficiency'] }}">
                         </div>
                         <button type="button" class="btn btn-danger remove-project-btn">Remove</button>
                     </div>

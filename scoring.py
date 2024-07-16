@@ -79,7 +79,6 @@ class Scoring:
 
         response = jd_parser(self.job_description)
         self.response = self.remove_nulls(response)
-        print("After removing nulls")
 
     # Function to remove null values from the output
     def remove_nulls(self, value):
@@ -92,15 +91,12 @@ class Scoring:
         
     # Function to calculate the final similarity score
     def final_similarity(self):
-        print("Before Model")
-        model_name = 'intfloat/e5-small-v2'
+        model_name = r'S:\resume_parsing\Resume-Manager\Resume_Manager\models\intfloate5-small-v2'
         tokenizer = AutoTokenizer.from_pretrained(model_name)
         model = AutoModel.from_pretrained(model_name)
 
         similarity_arr = dict()
         alpha = 0.8
-
-        print("Before for loop")
 
         for field in self.response.keys():
             if len(self.response[field]) != 0 and any([i.isalnum() for i in self.resume[field]]):
@@ -130,7 +126,6 @@ class Scoring:
             else:
                 similarity_arr[field] = 0
                 
-        print("Before final score")
         final_score = 0
         for i in similarity_arr.values():
             final_score += (100/8) * i

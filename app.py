@@ -202,7 +202,8 @@ def hod_button():
         list([dict(row._mapping) for row in res][0].values())[0]
         return render_template('hod_form.html')
     except (Exception):
-        pass #to-do: write the code to display wrong credentials - enter again... @puru
+        error = "Invalid Login Credentials!"
+        return render_template('login.html', error=error)
 
 def generate_vectors(jd_vec, dist):
     def random_unit_vector():
@@ -338,7 +339,6 @@ class Achievement(BaseModel):
     Start_Date: str = Field(description="Start date of the achievement")
     End_Date: str = Field(description="End date of the achievement")
     
-# Needs work
 class EducationDetails(BaseModel):
     Degree_Name: str = Field(description="Name of the degree persued by the candidate (Like BSc, B.Tech, MSc BCA, Phd, etc.)")
     Field_of_Study: str = Field(description="Field of study")
@@ -805,7 +805,7 @@ def submit():
     jd_text = open(r"S:\resume_parsing\job_descriptions\Prof.-CS-Sitare-University.txt", encoding='utf-8').read()
 
     resume_score = Scoring(jd_text, resume_info).final_similarity()
-    print(resume_score)
+    # print(resume_score)
     db.session.add(Score(personal_information_id=personal_info.id, 
                          score=resume_score))
 

@@ -21,6 +21,11 @@
     </nav>
     <div class="login-container">
         <h3>Please enter your credentials</h3>
+        {% if error%}
+            <p style="color: red; text-align: center;">
+                {{error}}
+            </p>
+        {% endif%}
         <form action="{{ url_for('hod_button') }}" method="post" class="form">
             <label for="username">Username</label><br>
             <input type="text" id="username" name="username" required><br>
